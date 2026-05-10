@@ -1,4 +1,4 @@
-import type { MultiTonePalette } from '../site-dna/index.js';
+import type { MultiTonePalette } from '@flashpoint/site-dna';
 
 /**
  * Generate a programmatic CSS multi-radial gradient string from a palette.

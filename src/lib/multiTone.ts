@@ -1,4 +1,4 @@
-import type { Section } from '../site-dna/index.js';
+import type { Section } from '@flashpoint/site-dna';
 
 const TONE_CYCLE = ['fp-tone-bg', 'fp-tone-surface', 'fp-tone-warm-1', 'fp-tone-cool-1'] as const;
 

@@ -8,6 +8,18 @@ Astro template that the orchestrator clones (via GitHub's repo-from-template) fo
 pnpm --filter master-scaffold dev
 ```
 
+### Standalone `npm` / Cloudflare (lockfile)
+
+This folder keeps a root **`package-lock.json`** for template repos built with **`npm ci`** on Cloudflare. Regenerate it with HTTPS-only GitHub URLs (avoid `git+ssh` in the lockfile):
+
+```sh
+export GIT_CONFIG_GLOBAL="$PWD/gitconfig-for-lockfile"
+rm -rf node_modules package-lock.json
+npm install
+```
+
+On Windows PowerShell: `$env:GIT_CONFIG_GLOBAL = "$PWD\gitconfig-for-lockfile"` then the same `npm install`.
+
 ## How the site customizes itself
 
 1. The orchestrator writes a fully populated `site-dna.json` into the new repo before the first build.

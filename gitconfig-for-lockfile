@@ -1,0 +1,11 @@
+# When regenerating package-lock.json, force GitHub over HTTPS so npm/pacote
+# does not record git+ssh:// (Cloudflare Pages cannot use SSH keys).
+#
+# Windows (PowerShell, from this directory):
+#   $env:GIT_CONFIG_GLOBAL = "$PWD\gitconfig-for-lockfile"
+# Unix:
+#   export GIT_CONFIG_GLOBAL="$PWD/gitconfig-for-lockfile"
+#
+# Then: rm -rf node_modules package-lock.json && npm install
+[url "https://github.com/"]
+	insteadOf = git@github.com:

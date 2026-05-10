@@ -1,0 +1,15 @@
+# build output
+dist/
+.astro/
+
+# generated types
+.cache/
+
+# deps (kept hoisted in monorepo, but in standalone clones it'll live here)
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.pnpm-store/

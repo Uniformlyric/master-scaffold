@@ -1,0 +1,22 @@
+{
+  "name": "master-scaffold",
+  "version": "0.2.0",
+  "private": false,
+  "type": "module",
+  "description": "Project Flashpoint - per-site Astro template. Cloned via GitHub repo-from-template by the orchestrator.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/tailwind": "^5.1.2",
+    "astro": "^4.16.6",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3",
+    "zod": "^3.23.8"
+  }
+}

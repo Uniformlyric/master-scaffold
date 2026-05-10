@@ -1,0 +1,42 @@
+---
+import type { Section } from '../site-dna/index.js';
+import Hero from './sections/Hero.astro';
+import Services from './sections/Services.astro';
+import Testimonials from './sections/Testimonials.astro';
+import Pricing from './sections/Pricing.astro';
+import Contact from './sections/Contact.astro';
+import SocialProof from './sections/SocialProof.astro';
+import Logo from './sections/Logo.astro';
+import Gallery from './sections/Gallery.astro';
+import BeforeAfter from './sections/BeforeAfter.astro';
+import { shouldUseGradient, toneClassForIndex } from '../lib/multiTone';
+import { siteDna } from '../lib/siteDna';
+import { meshGradientFor } from '../lib/meshGradient';
+
+interface Props {
+  section: Section;
+  index: number;
+}
+
+const { section, index } = Astro.props;
+const tone = toneClassForIndex(index);
+const useGradient = shouldUseGradient(section, index)
+  && (siteDna.designTokens.animations?.enableGradients ?? true);
+const useMesh = useGradient && siteDna.designTokens.vibe === 'The Modern';
+const meshStyle = useMesh ? `background: ${meshGradientFor(siteDna.designTokens.multiTonePalette)};` : '';
+---
+
+<div
+  class:list={[tone, useGradient && !useMesh && 'fp-gradient']}
+  style={meshStyle}
+>
+  {section === 'Hero' && <Hero />}
+  {section === 'Services' && <Services />}
+  {section === 'Testimonials' && <Testimonials />}
+  {section === 'Pricing' && <Pricing />}
+  {section === 'Contact' && <Contact />}
+  {section === 'SocialProof' && <SocialProof />}
+  {section === 'Logo' && <Logo />}
+  {section === 'Gallery' && <Gallery />}
+  {section === 'BeforeAfter' && <BeforeAfter />}
+</div>

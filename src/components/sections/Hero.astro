@@ -1,0 +1,44 @@
+---
+import { siteDna } from '../../lib/siteDna';
+const { businessInfo, assets } = siteDna;
+---
+
+<section class="fp-section">
+  <div class="grid items-center gap-10 md:grid-cols-2">
+    <div>
+      {businessInfo.tagline && (
+        <p class="text-sm font-semibold uppercase tracking-widest" style="color: var(--fp-accent)">
+          {businessInfo.tagline}
+        </p>
+      )}
+      <h1
+        class="mt-4 font-display text-5xl font-bold leading-tight md:text-6xl"
+        style="color: var(--fp-ink)"
+      >
+        {businessInfo.name}
+      </h1>
+      {businessInfo.valueProp && (
+        <p class="mt-6 text-lg leading-relaxed" style="color: var(--fp-muted)">
+          {businessInfo.valueProp}
+        </p>
+      )}
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#contact" class="fp-button">Get a quote</a>
+        <a href="#services" class="fp-button-outline">See services</a>
+      </div>
+    </div>
+    {
+      assets.hero && (
+        <figure class="overflow-hidden" style="border-radius: var(--fp-radius)">
+          <img
+            src={assets.hero.downloadURL}
+            alt={assets.hero.alt ?? businessInfo.name ?? 'hero'}
+            class="aspect-square w-full object-cover md:aspect-[4/5]"
+            width={assets.hero.width}
+            height={assets.hero.height}
+          />
+        </figure>
+      )
+    }
+  </div>
+</section>

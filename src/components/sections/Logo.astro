@@ -1,0 +1,30 @@
+---
+import { siteDna } from '../../lib/siteDna';
+const logo = siteDna.assets.logo;
+const name = siteDna.businessInfo.name ?? '';
+---
+
+<section class="fp-section">
+  <div class="flex flex-col items-center gap-3 text-center">
+    {
+      logo ? (
+        <img
+          src={logo.downloadURL}
+          alt={logo.alt ?? `${name} logo`}
+          class="h-24 w-auto"
+          width={logo.width}
+          height={logo.height}
+        />
+      ) : (
+        <div class="rounded-md border-2 border-dashed px-6 py-3 text-xs uppercase tracking-widest" style="border-color: var(--fp-muted); color: var(--fp-muted)">
+          Logo placeholder
+        </div>
+      )
+    }
+    {name && (
+      <p class="font-display text-lg" style="color: var(--fp-ink)">
+        {name}
+      </p>
+    )}
+  </div>
+</section>

@@ -1,0 +1,50 @@
+---
+import { siteDna } from '../../lib/siteDna';
+const { businessInfo } = siteDna;
+---
+
+<section id="contact" class="fp-section">
+  <div class="fp-card">
+    <h2 class="font-display text-3xl font-semibold md:text-4xl" style="color: var(--fp-ink)">
+      Get in touch
+    </h2>
+    <p class="mt-2" style="color: var(--fp-muted)">
+      Reach out to {businessInfo.name ?? 'us'} and we&rsquo;ll respond within one business day.
+    </p>
+
+    <form class="mt-8 grid gap-4 md:grid-cols-2" method="post" action="#">
+      <label class="flex flex-col gap-1 text-sm" style="color: var(--fp-muted)">
+        Name
+        <input
+          name="name"
+          required
+          class="rounded-md border bg-transparent px-3 py-2"
+          style="border-color: color-mix(in oklab, var(--fp-ink) 20%, transparent); color: var(--fp-ink)"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-sm" style="color: var(--fp-muted)">
+        Email
+        <input
+          type="email"
+          name="email"
+          required
+          class="rounded-md border bg-transparent px-3 py-2"
+          style="border-color: color-mix(in oklab, var(--fp-ink) 20%, transparent); color: var(--fp-ink)"
+        />
+      </label>
+      <label class="md:col-span-2 flex flex-col gap-1 text-sm" style="color: var(--fp-muted)">
+        How can we help?
+        <textarea
+          name="message"
+          rows="5"
+          required
+          class="rounded-md border bg-transparent px-3 py-2"
+          style="border-color: color-mix(in oklab, var(--fp-ink) 20%, transparent); color: var(--fp-ink)"
+        />
+      </label>
+      <div class="md:col-span-2">
+        <button type="submit" class="fp-button">Send message</button>
+      </div>
+    </form>
+  </div>
+</section>

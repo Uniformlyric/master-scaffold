@@ -1,0 +1,56 @@
+---
+import '../styles/global.css';
+import '../styles/vibes.css';
+import { GOOGLE_FONTS_HREF_BY_VIBE } from '../site-dna/index.js';
+import { siteDna } from '../lib/siteDna';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const pageTitle = title ?? siteDna.businessInfo.name ?? 'Flashpoint Site';
+const pageDescription =
+  description ?? siteDna.businessInfo.valueProp ?? siteDna.businessInfo.tagline ?? '';
+const vibe = siteDna.designTokens.vibe;
+const fontsHref = GOOGLE_FONTS_HREF_BY_VIBE[vibe];
+
+const palette = siteDna.designTokens.multiTonePalette;
+const typography = siteDna.designTokens.typography;
+
+// Build the per-lead override block. Falls back to vibes.css when fields absent.
+const overrideStyle = [
+  `--fp-bg: ${palette.surfaceVariants[0] ?? palette.coolTones[0] ?? palette.warmTones[0] ?? '#0F172A'};`,
+  `--fp-surface: ${palette.surfaceVariants[1] ?? palette.warmTones[0] ?? palette.coolTones[1] ?? '#1F2937'};`,
+  palette.warmTones[0] ? `--fp-warm-1: ${palette.warmTones[0]};` : '',
+  palette.coolTones[0] ? `--fp-cool-1: ${palette.coolTones[0]};` : '',
+  `--fp-accent: ${palette.accent};`,
+  palette.ink ? `--fp-ink: ${palette.ink};` : '',
+  palette.muted ? `--fp-muted: ${palette.muted};` : '',
+  `--fp-font-display: ${typography.headingStack};`,
+  `--fp-font-body: ${typography.bodyStack};`,
+  `--fp-radius: ${typography.borderRadius};`,
+  `--fp-border-width: ${typography.borderWidth};`,
+  typography.letterSpacing ? `--fp-letter-spacing: ${typography.letterSpacing};` : '',
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<!doctype html>
+<html lang="en" data-vibe={vibe}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={pageDescription} />
+    <title>{pageTitle}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={fontsHref} />
+    <style is:inline set:html={`:root { ${overrideStyle} }`}></style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

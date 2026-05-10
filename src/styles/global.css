@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* These are intentionally NOT pure white/black per the v1.9 Background
+       Rule. Per-vibe overrides in vibes.css and per-lead overrides injected
+       via Layout.astro's inline style take precedence. */
+    --fp-bg: #FAF9F6;
+    --fp-surface: #FFFDD0;
+    --fp-accent: #F97316;
+    --fp-ink: #2F3E46;
+    --fp-muted: #475569;
+    --fp-font-display: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --fp-font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --fp-radius: 0.75rem;
+    --fp-border-width: 1px;
+    --fp-letter-spacing: 0;
+  }
+
+  html {
+    background: var(--fp-bg);
+    color: var(--fp-ink);
+    font-family: var(--fp-font-body);
+    letter-spacing: var(--fp-letter-spacing);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--fp-font-display);
+  }
+}
+
+@layer components {
+  .fp-section {
+    @apply mx-auto w-full px-6 py-20;
+    max-width: 80rem;
+  }
+
+  .fp-card {
+    background: var(--fp-surface);
+    color: var(--fp-ink);
+    border: var(--fp-border-width) solid color-mix(in oklab, var(--fp-ink) 12%, transparent);
+    border-radius: var(--fp-radius);
+    padding: 1.5rem;
+  }
+
+  .fp-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+    border-radius: var(--fp-radius);
+    border: var(--fp-border-width) solid transparent;
+    background: var(--fp-accent);
+    color: var(--fp-bg);
+    transition: filter 0.15s ease;
+  }
+
+  .fp-button:hover {
+    filter: brightness(1.1);
+  }
+
+  .fp-button-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+    border-radius: var(--fp-radius);
+    border: var(--fp-border-width) solid color-mix(in oklab, var(--fp-ink) 30%, transparent);
+    background: transparent;
+    color: var(--fp-ink);
+  }
+
+  /* Section background tones - cycled by Layout.astro per section index. */
+  .fp-tone-bg     { background: var(--fp-bg); }
+  .fp-tone-surface { background: var(--fp-surface); }
+  .fp-tone-warm-1 { background: var(--fp-warm-1, var(--fp-surface)); }
+  .fp-tone-cool-1 { background: var(--fp-cool-1, var(--fp-bg)); }
+}
+
+/* Mesh gradient (Modern vibe). Parameterized via CSS vars set per lead. */
+.fp-mesh {
+  background:
+    radial-gradient(60% 60% at 20% 20%, color-mix(in oklab, var(--fp-accent) 30%, transparent), transparent 70%),
+    radial-gradient(50% 50% at 80% 30%, color-mix(in oklab, var(--fp-accent) 20%, transparent), transparent 70%),
+    radial-gradient(40% 40% at 50% 90%, color-mix(in oklab, var(--fp-warm-1, var(--fp-accent)) 25%, transparent), transparent 70%),
+    var(--fp-bg);
+}
+
+/* Subtle gradient for The Bold vibe. */
+.fp-gradient {
+  background:
+    radial-gradient(60% 60% at 20% 20%, color-mix(in oklab, var(--fp-accent) 35%, transparent), transparent 70%),
+    radial-gradient(50% 50% at 80% 30%, color-mix(in oklab, var(--fp-accent) 20%, transparent), transparent 70%),
+    var(--fp-bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .fp-mesh,
+  .fp-gradient {
+    background: var(--fp-bg);
+  }
+}

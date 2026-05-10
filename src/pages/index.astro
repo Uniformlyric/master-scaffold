@@ -1,0 +1,13 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SectionRenderer from '../components/SectionRenderer.astro';
+import { siteDna } from '../lib/siteDna';
+
+const sections = siteDna.layout.sectionOrder.length > 0
+  ? siteDna.layout.sectionOrder
+  : (['Hero', 'Services', 'Testimonials', 'Pricing', 'Contact'] as const);
+---
+
+<Layout>
+  {sections.map((section, index) => <SectionRenderer section={section} index={index} />)}
+</Layout>

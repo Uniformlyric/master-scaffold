@@ -1,0 +1,64 @@
+---
+import { siteDna } from '../../lib/siteDna';
+const gallery = siteDna.assets.gallery ?? [];
+const before = gallery[0];
+const after = gallery[1] ?? siteDna.assets.hero;
+---
+
+<section class="fp-section">
+  <h2 class="font-display text-3xl font-semibold md:text-4xl" style="color: var(--fp-ink)">
+    Before &amp; After
+  </h2>
+  <p class="mt-2" style="color: var(--fp-muted)">
+    A look at the transformation.
+  </p>
+
+  <div class="mt-8 grid gap-4 md:grid-cols-2">
+    <figure class="fp-card overflow-hidden p-0">
+      {
+        before ? (
+          <img
+            src={before.downloadURL}
+            alt={before.alt ?? 'Before'}
+            class="aspect-video w-full object-cover"
+            width={before.width}
+            height={before.height}
+          />
+        ) : (
+          <div class="flex aspect-video items-center justify-center text-xs uppercase tracking-widest" style="color: var(--fp-muted)">
+            Before placeholder
+          </div>
+        )
+      }
+      <figcaption
+        class="px-4 py-2 text-xs uppercase tracking-widest"
+        style="color: var(--fp-muted)"
+      >
+        Before
+      </figcaption>
+    </figure>
+    <figure class="fp-card overflow-hidden p-0">
+      {
+        after ? (
+          <img
+            src={after.downloadURL}
+            alt={after.alt ?? 'After'}
+            class="aspect-video w-full object-cover"
+            width={after.width}
+            height={after.height}
+          />
+        ) : (
+          <div class="flex aspect-video items-center justify-center text-xs uppercase tracking-widest" style="color: var(--fp-muted)">
+            After placeholder
+          </div>
+        )
+      }
+      <figcaption
+        class="px-4 py-2 text-xs uppercase tracking-widest"
+        style="color: var(--fp-accent)"
+      >
+        After
+      </figcaption>
+    </figure>
+  </div>
+</section>

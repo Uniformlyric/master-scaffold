@@ -1,0 +1,28 @@
+---
+const placeholders = [
+  { quote: 'Booked, fixed, and gone in under two hours. Phenomenal.', author: 'Maya R.' },
+  { quote: 'Honest pricing and they cleaned up after themselves.', author: 'Devon K.' },
+  { quote: 'Saved my kitchen at midnight. New customer for life.', author: 'Priya S.' },
+];
+---
+
+<section id="testimonials" class="fp-section">
+  <h2 class="font-display text-3xl font-semibold md:text-4xl" style="color: var(--fp-ink)">
+    What customers say
+  </h2>
+
+  <div class="mt-10 grid gap-6 md:grid-cols-3">
+    {
+      placeholders.map((t) => (
+        <figure class="fp-card">
+          <blockquote class="text-lg" style="color: var(--fp-ink)">
+            &ldquo;{t.quote}&rdquo;
+          </blockquote>
+          <figcaption class="mt-4 text-sm" style="color: var(--fp-muted)">
+            &mdash; {t.author}
+          </figcaption>
+        </figure>
+      ))
+    }
+  </div>
+</section>

@@ -1,0 +1,38 @@
+---
+import { siteDna } from '../../lib/siteDna';
+const services = (siteDna.businessInfo.services ?? []).filter((s) => Boolean(s.priceLabel));
+---
+
+<section id="pricing" class="fp-section">
+  <h2 class="font-display text-3xl font-semibold md:text-4xl" style="color: var(--fp-ink)">
+    Pricing
+  </h2>
+  <p class="mt-2" style="color: var(--fp-muted)">Transparent starting prices. No surprises.</p>
+
+  <div class="mt-10 grid gap-6 md:grid-cols-3">
+    {
+      services.length === 0 ? (
+        <p class="fp-card" style="color: var(--fp-muted)">
+          Pricing coming soon.
+        </p>
+      ) : (
+        services.map((service) => (
+          <article class="fp-card flex flex-col">
+            <h3 class="font-display text-lg font-semibold" style="color: var(--fp-ink)">
+              {service.title}
+            </h3>
+            <p class="mt-1 text-sm" style="color: var(--fp-muted)">
+              {service.description}
+            </p>
+            <p class="mt-6 text-3xl font-bold" style="color: var(--fp-accent)">
+              {service.priceLabel}
+            </p>
+            <a href="#contact" class="fp-button mt-6 self-start">
+              Book this
+            </a>
+          </article>
+        ))
+      )
+    }
+  </div>
+</section>

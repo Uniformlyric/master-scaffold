@@ -5,60 +5,56 @@ const before = gallery[0];
 const after = gallery[1] ?? siteDna.assets.hero;
 ---
 
-<section class="fp-section">
-  <h2 class="font-display text-3xl font-semibold md:text-4xl" style="color: var(--fp-ink)">
-    Before &amp; After
-  </h2>
-  <p class="mt-2" style="color: var(--fp-muted)">
-    A look at the transformation.
-  </p>
+<section class="fp-section" data-reveal>
+  <div class="mx-auto max-w-2xl text-center">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--fp-accent)">
+      Real results
+    </p>
+    <h2
+      class="mt-3 font-display text-3xl font-semibold md:text-4xl lg:text-5xl"
+      style="color: var(--fp-ink)"
+    >
+      Before &amp; after
+    </h2>
+    <p class="mt-4 text-base md:text-lg" style="color: var(--fp-muted)">
+      A look at the transformation our clients see.
+    </p>
+  </div>
 
-  <div class="mt-8 grid gap-4 md:grid-cols-2">
-    <figure class="fp-card overflow-hidden p-0">
-      {
-        before ? (
-          <img
-            src={before.downloadURL}
-            alt={before.alt ?? 'Before'}
-            class="aspect-video w-full object-cover"
-            width={before.width}
-            height={before.height}
-          />
-        ) : (
-          <div class="flex aspect-video items-center justify-center text-xs uppercase tracking-widest" style="color: var(--fp-muted)">
-            Before placeholder
-          </div>
-        )
-      }
-      <figcaption
-        class="px-4 py-2 text-xs uppercase tracking-widest"
-        style="color: var(--fp-muted)"
-      >
-        Before
-      </figcaption>
-    </figure>
-    <figure class="fp-card overflow-hidden p-0">
-      {
-        after ? (
-          <img
-            src={after.downloadURL}
-            alt={after.alt ?? 'After'}
-            class="aspect-video w-full object-cover"
-            width={after.width}
-            height={after.height}
-          />
-        ) : (
-          <div class="flex aspect-video items-center justify-center text-xs uppercase tracking-widest" style="color: var(--fp-muted)">
-            After placeholder
-          </div>
-        )
-      }
-      <figcaption
-        class="px-4 py-2 text-xs uppercase tracking-widest"
-        style="color: var(--fp-accent)"
-      >
-        After
-      </figcaption>
-    </figure>
+  <div class="mt-12 grid gap-6 md:grid-cols-2">
+    {[
+      { asset: before, label: 'Before', accent: false },
+      { asset: after, label: 'After', accent: true },
+    ].map(({ asset, label, accent }) => (
+      <figure class="fp-card relative overflow-hidden p-0">
+        <div class="relative">
+          {asset ? (
+            <img
+              src={asset.downloadURL}
+              alt={asset.alt ?? label}
+              class="block aspect-video w-full object-cover"
+              loading="lazy"
+              width={asset.width}
+              height={asset.height}
+            />
+          ) : (
+            <div
+              class="flex aspect-video items-center justify-center text-xs uppercase tracking-widest"
+              style="background: color-mix(in oklab, var(--fp-ink) 6%, transparent); color: var(--fp-muted);"
+            >
+              {label} placeholder
+            </div>
+          )}
+          <span
+            class="absolute left-3 top-3 px-3 py-1 text-[11px] font-bold uppercase tracking-widest"
+            style={accent
+              ? `background: var(--fp-accent); color: var(--fp-on-accent); border-radius: var(--fp-radius);`
+              : `background: color-mix(in oklab, var(--fp-ink) 75%, transparent); color: var(--fp-bg); border-radius: var(--fp-radius);`}
+          >
+            {label}
+          </span>
+        </div>
+      </figure>
+    ))}
   </div>
 </section>

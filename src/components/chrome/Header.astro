@@ -1,0 +1,76 @@
+---
+import { siteDna } from '../../lib/siteDna';
+import { businessInitials } from '../../lib/defaults';
+import Icon from '../Icon.astro';
+
+const { businessInfo, assets } = siteDna;
+const name = businessInfo.name ?? 'Your Business';
+const initials = businessInitials(businessInfo);
+const logo = assets.logo;
+---
+
+<header
+  class="fp-header sticky top-0 z-40 w-full"
+  style="background: color-mix(in oklab, var(--fp-bg) 88%, transparent); backdrop-filter: saturate(140%) blur(12px); border-bottom: 1px solid var(--fp-border-on-bg);"
+>
+  <div class="mx-auto flex w-full max-w-[80rem] items-center justify-between gap-4 px-6 py-3">
+    <a href="#top" class="flex items-center gap-3" aria-label={`${name} home`}>
+      {logo ? (
+        <img
+          src={logo.downloadURL}
+          alt={`${name} logo`}
+          class="h-9 w-auto"
+          width={logo.width}
+          height={logo.height}
+        />
+      ) : (
+        <span
+          class="flex h-9 w-9 items-center justify-center font-display text-sm font-bold"
+          style="background: color-mix(in oklab, var(--fp-on-bg) 18%, transparent); color: var(--fp-on-bg); border-radius: var(--fp-radius);"
+        >
+          {initials}
+        </span>
+      )}
+      <span class="font-display text-base font-semibold md:text-lg" style="color: var(--fp-on-bg)">
+        {name}
+      </span>
+    </a>
+
+    <nav class="hidden items-center gap-7 md:flex" aria-label="Primary">
+      <a href="#services" class="text-sm font-medium hover:underline" style="color: var(--fp-on-bg)">Services</a>
+      <a href="#pricing" class="text-sm font-medium hover:underline" style="color: var(--fp-on-bg)">Pricing</a>
+      <a href="#testimonials" class="text-sm font-medium hover:underline" style="color: var(--fp-on-bg)">Reviews</a>
+      <a href="#faq" class="text-sm font-medium hover:underline" style="color: var(--fp-on-bg)">FAQ</a>
+      <a href="#contact" class="text-sm font-medium hover:underline" style="color: var(--fp-on-bg)">Contact</a>
+    </nav>
+
+    <a href="#contact" class="fp-button hidden text-sm sm:inline-flex">
+      Get a quote
+    </a>
+
+    <button
+      type="button"
+      class="inline-flex h-10 w-10 items-center justify-center md:hidden"
+      style="color: var(--fp-on-bg);"
+      aria-label="Open menu"
+      onclick="document.getElementById('fp-mobile-nav')?.toggleAttribute('hidden')"
+    >
+      <Icon name="menu" size={22} />
+    </button>
+  </div>
+
+  <div
+    id="fp-mobile-nav"
+    hidden
+    class="md:hidden"
+    style="background: var(--fp-bg); border-top: 1px solid var(--fp-border-on-bg);"
+  >
+    <nav class="mx-auto flex w-full max-w-[80rem] flex-col px-6 py-3" aria-label="Mobile">
+      <a href="#services" class="py-2 text-sm font-medium" style="color: var(--fp-on-bg)">Services</a>
+      <a href="#pricing" class="py-2 text-sm font-medium" style="color: var(--fp-on-bg)">Pricing</a>
+      <a href="#testimonials" class="py-2 text-sm font-medium" style="color: var(--fp-on-bg)">Reviews</a>
+      <a href="#faq" class="py-2 text-sm font-medium" style="color: var(--fp-on-bg)">FAQ</a>
+      <a href="#contact" class="py-2 text-sm font-medium" style="color: var(--fp-on-bg)">Contact</a>
+    </nav>
+  </div>
+</header>

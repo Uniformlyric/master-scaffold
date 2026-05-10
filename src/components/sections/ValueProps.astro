@@ -1,0 +1,31 @@
+---
+import { siteDna } from '../../lib/siteDna';
+import { defaultValueProps } from '../../lib/defaults';
+import Icon from '../Icon.astro';
+
+const props = defaultValueProps(siteDna.businessInfo);
+---
+
+<section class="fp-section py-16 md:py-20" data-reveal>
+  <div class="grid gap-6 md:grid-cols-3">
+    {props.map((p) => (
+      <div
+        class="flex h-full flex-col items-start gap-4 p-6"
+        style="border: var(--fp-border-width) solid var(--fp-border-color); border-radius: var(--fp-radius);"
+      >
+        <span
+          class="flex h-12 w-12 items-center justify-center"
+          style="background: color-mix(in oklab, var(--fp-accent) 18%, transparent); color: var(--fp-accent); border-radius: var(--fp-radius);"
+        >
+          <Icon name={p.icon} size={24} />
+        </span>
+        <h3 class="font-display text-lg font-semibold" style="color: var(--fp-ink)">
+          {p.title}
+        </h3>
+        <p class="text-sm leading-relaxed" style="color: var(--fp-muted)">
+          {p.blurb}
+        </p>
+      </div>
+    ))}
+  </div>
+</section>

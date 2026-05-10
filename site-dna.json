@@ -2,21 +2,21 @@
   "businessInfo": {
     "name": "Acme Plumbing Co.",
     "tagline": "Reliable plumbing, on-time every time.",
-    "valueProp": "Family-owned plumbing serving the metro area for 20+ years.",
+    "valueProp": "Family-owned plumbing serving the metro area for 20+ years. Emergency response, transparent pricing, written satisfaction guarantee on every job.",
     "services": [
       {
         "title": "Emergency Repairs",
-        "description": "24/7 burst pipes, leaks, and clogs.",
+        "description": "24/7 response for burst pipes, leaks, and clogs. Most calls resolved in under two hours.",
         "priceLabel": "From $149"
       },
       {
         "title": "Water Heater Install",
-        "description": "Tank and tankless installs with a 10-year warranty.",
+        "description": "Tank and tankless installs with a 10-year manufacturer warranty and our own 5-year workmanship guarantee.",
         "priceLabel": "From $1,200"
       },
       {
         "title": "Drain Cleaning",
-        "description": "Camera inspection and hydro-jetting.",
+        "description": "Full camera inspection plus hydro-jetting to clear and verify the line - not just a quick snake.",
         "priceLabel": "From $189"
       }
     ]
@@ -29,11 +29,11 @@
     },
     "multiTonePalette": {
       "warmTones": ["#FFFDD0"],
-      "coolTones": ["#1B263B", "#2F3E46"],
-      "surfaceVariants": ["#1F2A37", "#2F3E46"],
+      "coolTones": ["#1B263B"],
+      "surfaceVariants": ["#0b0a14", "#1a1325"],
       "accent": "#F97316",
       "ink": "#FEF9C3",
-      "muted": "#A78BFA"
+      "muted": "#C4B5FD"
     },
     "typography": {
       "headingStack": "\"Archivo Black\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
@@ -45,6 +45,16 @@
   },
   "assets": {},
   "layout": {
-    "sectionOrder": ["Hero", "Services", "SocialProof", "Pricing", "Testimonials", "Contact"]
+    "sectionOrder": [
+      "Hero",
+      "ValueProps",
+      "Services",
+      "SocialProof",
+      "BeforeAfter",
+      "Pricing",
+      "Testimonials",
+      "FAQ",
+      "Contact"
+    ]
   }
 }

@@ -1,0 +1,58 @@
+---
+import { siteDna } from '../../lib/siteDna';
+import { defaultFAQs } from '../../lib/defaults';
+import Icon from '../Icon.astro';
+
+const faqs = defaultFAQs(siteDna.businessInfo);
+---
+
+<section id="faq" class="fp-section" data-reveal>
+  <div class="mx-auto max-w-2xl text-center">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--fp-accent)">
+      Common questions
+    </p>
+    <h2
+      class="mt-3 font-display text-3xl font-semibold md:text-4xl lg:text-5xl"
+      style="color: var(--fp-ink)"
+    >
+      Frequently asked
+    </h2>
+    <p class="mt-4 text-base md:text-lg" style="color: var(--fp-muted)">
+      Don&rsquo;t see what you&rsquo;re looking for? Reach out and we&rsquo;ll get back to you the same day.
+    </p>
+  </div>
+
+  <div class="mx-auto mt-10 max-w-3xl">
+    {faqs.map((faq) => (
+      <details
+        class="group fp-faq-item"
+        style="border-bottom: var(--fp-border-width) solid var(--fp-border-color);"
+      >
+        <summary
+          class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-base font-semibold md:text-lg"
+          style="color: var(--fp-ink)"
+        >
+          <span>{faq.q}</span>
+          <span
+            class="flex h-8 w-8 shrink-0 items-center justify-center transition-transform group-open:rotate-45"
+            style="border: var(--fp-border-width) solid var(--fp-border-color); border-radius: 999px; color: var(--fp-accent);"
+          >
+            <Icon name="plus" size={16} />
+          </span>
+        </summary>
+        <p
+          class="pb-5 pr-12 text-sm leading-relaxed md:text-base"
+          style="color: var(--fp-muted)"
+        >
+          {faq.a}
+        </p>
+      </details>
+    ))}
+  </div>
+</section>
+
+<style>
+  .fp-faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+</style>

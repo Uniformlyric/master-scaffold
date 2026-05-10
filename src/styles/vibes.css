@@ -1,23 +1,42 @@
 /*
- * Vibe presets per Project Flashpoint v1.9 brief.
- * Layout.astro applies <html data-vibe="..."> AND injects per-lead palette
- * overrides via inline style. These vars are the FALLBACK when the lead
- * hasn't customized the palette.
+ * Vibe presets per Project Flashpoint v1.9 brief, expanded for the
+ * closing-asset polish pass.
  *
- * Per-vibe spec:
- *   The Bold:         Archivo Black, 0px radius, 2px borders, dark bold accent
- *   The Professional: Source Serif 4, 8px radius, 1px borders, subtle elevation
- *   The Modern:       Plus Jakarta Sans, 24px pill radii, 0px borders, mesh
+ * Each vibe declares:
+ *   1. Palette tokens          (--fp-bg / -surface / -warm-1 / -cool-1 / -accent)
+ *   2. Default ink + muted     (--fp-ink / --fp-muted) - used when no tone class
+ *   3. Per-tone contrast tokens (--fp-on-bg, --fp-on-surface, ...) so .fp-tone-*
+ *      classes in global.css can re-bind --fp-ink / --fp-muted / --fp-border-color
+ *      to a WCAG AA-clearing pair on every band.
+ *   4. Border-on-tone tokens   (--fp-border-on-*) for cards / inputs
+ *   5. Typography + radius / border / letter-spacing
+ *
+ * scripts/check-contrast.mjs verifies every text/background pair >= WCAG AA at
+ * `npm run prebuild` time. Do not ship a vibe that fails the check.
  */
 
+/* ---------- The Bold ---------- dark navy + cream + orange ---------- */
 :root[data-vibe='The Bold'] {
   --fp-bg: #0b0a14;
   --fp-surface: #1a1325;
   --fp-warm-1: #FFFDD0;
   --fp-cool-1: #1B263B;
   --fp-accent: #F97316;
+
   --fp-ink: #FEF9C3;
-  --fp-muted: #A78BFA;
+  --fp-muted: #C4B5FD;
+
+  --fp-on-bg:        #FEF9C3;  --fp-on-bg-muted:        #C4B5FD;
+  --fp-on-surface:   #FEF9C3;  --fp-on-surface-muted:   #C4B5FD;
+  --fp-on-warm:      #1A1325;  --fp-on-warm-muted:      #4B3F5E;
+  --fp-on-cool:      #FEF9C3;  --fp-on-cool-muted:      #CBD5F5;
+  --fp-on-accent:    #0B0A14;
+
+  --fp-border-on-bg:      color-mix(in oklab, var(--fp-on-bg) 35%, transparent);
+  --fp-border-on-surface: color-mix(in oklab, var(--fp-on-surface) 35%, transparent);
+  --fp-border-on-warm:    color-mix(in oklab, var(--fp-on-warm) 35%, transparent);
+  --fp-border-on-cool:    color-mix(in oklab, var(--fp-on-cool) 35%, transparent);
+
   --fp-font-display: 'Archivo Black', ui-sans-serif, system-ui, sans-serif;
   --fp-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --fp-radius: 0px;
@@ -25,14 +44,28 @@
   --fp-letter-spacing: -0.01em;
 }
 
+/* ---------- The Professional ---------- warm white + slate + blue ---------- */
 :root[data-vibe='The Professional'] {
   --fp-bg: #FAF9F6;
   --fp-surface: #F5EFE0;
   --fp-warm-1: #FFFDD0;
   --fp-cool-1: #E8DCC4;
   --fp-accent: #1D4ED8;
+
   --fp-ink: #1F2937;
   --fp-muted: #475569;
+
+  --fp-on-bg:        #1F2937;  --fp-on-bg-muted:        #475569;
+  --fp-on-surface:   #1F2937;  --fp-on-surface-muted:   #475569;
+  --fp-on-warm:      #1F2937;  --fp-on-warm-muted:      #475569;
+  --fp-on-cool:      #1F2937;  --fp-on-cool-muted:      #475569;
+  --fp-on-accent:    #FAF9F6;
+
+  --fp-border-on-bg:      color-mix(in oklab, var(--fp-on-bg) 22%, transparent);
+  --fp-border-on-surface: color-mix(in oklab, var(--fp-on-surface) 22%, transparent);
+  --fp-border-on-warm:    color-mix(in oklab, var(--fp-on-warm) 22%, transparent);
+  --fp-border-on-cool:    color-mix(in oklab, var(--fp-on-cool) 22%, transparent);
+
   --fp-font-display: 'Source Serif 4', Georgia, serif;
   --fp-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --fp-radius: 8px;
@@ -40,14 +73,28 @@
   --fp-letter-spacing: 0;
 }
 
+/* ---------- The Modern ---------- midnight + cyan + jakarta ---------- */
 :root[data-vibe='The Modern'] {
   --fp-bg: #0f172a;
   --fp-surface: #111827;
   --fp-warm-1: #1F2A37;
   --fp-cool-1: #1B263B;
   --fp-accent: #22D3EE;
+
   --fp-ink: #F1F5F9;
   --fp-muted: #94A3B8;
+
+  --fp-on-bg:        #F1F5F9;  --fp-on-bg-muted:        #94A3B8;
+  --fp-on-surface:   #F1F5F9;  --fp-on-surface-muted:   #94A3B8;
+  --fp-on-warm:      #F1F5F9;  --fp-on-warm-muted:      #94A3B8;
+  --fp-on-cool:      #F1F5F9;  --fp-on-cool-muted:      #94A3B8;
+  --fp-on-accent:    #0f172a;
+
+  --fp-border-on-bg:      color-mix(in oklab, var(--fp-on-bg) 18%, transparent);
+  --fp-border-on-surface: color-mix(in oklab, var(--fp-on-surface) 18%, transparent);
+  --fp-border-on-warm:    color-mix(in oklab, var(--fp-on-warm) 18%, transparent);
+  --fp-border-on-cool:    color-mix(in oklab, var(--fp-on-cool) 18%, transparent);
+
   --fp-font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
   --fp-font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
   --fp-radius: 24px;
@@ -55,21 +102,195 @@
   --fp-letter-spacing: -0.005em;
 }
 
-/* Per-vibe component tweaks */
+/* ---------- The Artisan ---------- cream + clay + terracotta ---------- */
+:root[data-vibe='The Artisan'] {
+  --fp-bg: #FFF8EC;
+  --fp-surface: #F5E6D3;
+  --fp-warm-1: #E8C9A5;
+  --fp-cool-1: #D9C9B5;
+  --fp-accent: #B8542F;
+
+  --fp-ink: #3D2817;
+  --fp-muted: #6B4423;
+
+  --fp-on-bg:        #3D2817;  --fp-on-bg-muted:        #6B4423;
+  --fp-on-surface:   #3D2817;  --fp-on-surface-muted:   #6B4423;
+  --fp-on-warm:      #3D2817;  --fp-on-warm-muted:      #6B4423;
+  --fp-on-cool:      #3D2817;  --fp-on-cool-muted:      #6B4423;
+  --fp-on-accent:    #FFF8EC;
+
+  --fp-border-on-bg:      color-mix(in oklab, var(--fp-on-bg) 25%, transparent);
+  --fp-border-on-surface: color-mix(in oklab, var(--fp-on-surface) 25%, transparent);
+  --fp-border-on-warm:    color-mix(in oklab, var(--fp-on-warm) 25%, transparent);
+  --fp-border-on-cool:    color-mix(in oklab, var(--fp-on-cool) 25%, transparent);
+
+  --fp-font-display: 'Fraunces', Georgia, serif;
+  --fp-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --fp-radius: 4px;
+  --fp-border-width: 1px;
+  --fp-letter-spacing: 0;
+}
+
+/* ---------- The Wellness ---------- sage + blush + cream ---------- */
+:root[data-vibe='The Wellness'] {
+  --fp-bg: #FAF6F2;
+  --fp-surface: #E8F0E5;
+  --fp-warm-1: #F4E4DD;
+  --fp-cool-1: #D4E5D9;
+  --fp-accent: #4F6F3F;
+
+  --fp-ink: #1F3320;
+  --fp-muted: #4F5C4F;
+
+  --fp-on-bg:        #1F3320;  --fp-on-bg-muted:        #4F5C4F;
+  --fp-on-surface:   #1F3320;  --fp-on-surface-muted:   #4F5C4F;
+  --fp-on-warm:      #1F3320;  --fp-on-warm-muted:      #4F5C4F;
+  --fp-on-cool:      #1F3320;  --fp-on-cool-muted:      #4F5C4F;
+  --fp-on-accent:    #FAF6F2;
+
+  --fp-border-on-bg:      color-mix(in oklab, var(--fp-on-bg) 22%, transparent);
+  --fp-border-on-surface: color-mix(in oklab, var(--fp-on-surface) 22%, transparent);
+  --fp-border-on-warm:    color-mix(in oklab, var(--fp-on-warm) 22%, transparent);
+  --fp-border-on-cool:    color-mix(in oklab, var(--fp-on-cool) 22%, transparent);
+
+  --fp-font-display: 'Quicksand', ui-sans-serif, system-ui, sans-serif;
+  --fp-font-body: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  --fp-radius: 16px;
+  --fp-border-width: 1px;
+  --fp-letter-spacing: 0;
+}
+
+/* ---------- The Editorial ---------- paper + ink + accent red ---------- */
+:root[data-vibe='The Editorial'] {
+  --fp-bg: #FAFAFA;
+  --fp-surface: #F0F0F0;
+  --fp-warm-1: #E8E0D0;
+  --fp-cool-1: #1A1A1A;
+  --fp-accent: #B0102A;
+
+  --fp-ink: #0A0A0A;
+  --fp-muted: #525252;
+
+  --fp-on-bg:        #0A0A0A;  --fp-on-bg-muted:        #525252;
+  --fp-on-surface:   #0A0A0A;  --fp-on-surface-muted:   #525252;
+  --fp-on-warm:      #0A0A0A;  --fp-on-warm-muted:      #525252;
+  --fp-on-cool:      #FAFAFA;  --fp-on-cool-muted:      #B8B8B8;
+  --fp-on-accent:    #FAFAFA;
+
+  --fp-border-on-bg:      color-mix(in oklab, var(--fp-on-bg) 18%, transparent);
+  --fp-border-on-surface: color-mix(in oklab, var(--fp-on-surface) 18%, transparent);
+  --fp-border-on-warm:    color-mix(in oklab, var(--fp-on-warm) 18%, transparent);
+  --fp-border-on-cool:    color-mix(in oklab, var(--fp-on-cool) 35%, transparent);
+
+  --fp-font-display: 'Playfair Display', Georgia, serif;
+  --fp-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --fp-radius: 0px;
+  --fp-border-width: 1px;
+  --fp-letter-spacing: -0.01em;
+}
+
+/* ---------- The Luxe ---------- black + gold + ivory ---------- */
+:root[data-vibe='The Luxe'] {
+  --fp-bg: #0A0A0A;
+  --fp-surface: #1F1A0F;
+  --fp-warm-1: #F5EBD3;
+  --fp-cool-1: #2A2520;
+  --fp-accent: #C9A961;
+
+  --fp-ink: #F5EBD3;
+  --fp-muted: #C2B393;
+
+  --fp-on-bg:        #F5EBD3;  --fp-on-bg-muted:        #C2B393;
+  --fp-on-surface:   #F5EBD3;  --fp-on-surface-muted:   #C2B393;
+  --fp-on-warm:      #1F1A0F;  --fp-on-warm-muted:      #5C4F3A;
+  --fp-on-cool:      #F5EBD3;  --fp-on-cool-muted:      #C2B393;
+  --fp-on-accent:    #0A0A0A;
+
+  --fp-border-on-bg:      color-mix(in oklab, var(--fp-on-bg) 28%, transparent);
+  --fp-border-on-surface: color-mix(in oklab, var(--fp-on-surface) 28%, transparent);
+  --fp-border-on-warm:    color-mix(in oklab, var(--fp-on-warm) 28%, transparent);
+  --fp-border-on-cool:    color-mix(in oklab, var(--fp-on-cool) 28%, transparent);
+
+  --fp-font-display: 'Cormorant Garamond', 'Cormorant', Georgia, serif;
+  --fp-font-body: 'Lato', ui-sans-serif, system-ui, sans-serif;
+  --fp-radius: 2px;
+  --fp-border-width: 1px;
+  --fp-letter-spacing: 0.02em;
+}
+
+/* ---------- The Tech ---------- white + indigo + space grotesk ---------- */
+:root[data-vibe='The Tech'] {
+  --fp-bg: #FAFBFC;
+  --fp-surface: #F0F4FA;
+  --fp-warm-1: #E8EDF5;
+  --fp-cool-1: #E0E8F5;
+  --fp-accent: #4338CA;
+
+  --fp-ink: #0F172A;
+  --fp-muted: #475569;
+
+  --fp-on-bg:        #0F172A;  --fp-on-bg-muted:        #475569;
+  --fp-on-surface:   #0F172A;  --fp-on-surface-muted:   #475569;
+  --fp-on-warm:      #0F172A;  --fp-on-warm-muted:      #475569;
+  --fp-on-cool:      #0F172A;  --fp-on-cool-muted:      #475569;
+  --fp-on-accent:    #FAFBFC;
+
+  --fp-border-on-bg:      color-mix(in oklab, var(--fp-on-bg) 16%, transparent);
+  --fp-border-on-surface: color-mix(in oklab, var(--fp-on-surface) 16%, transparent);
+  --fp-border-on-warm:    color-mix(in oklab, var(--fp-on-warm) 16%, transparent);
+  --fp-border-on-cool:    color-mix(in oklab, var(--fp-on-cool) 16%, transparent);
+
+  --fp-font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --fp-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --fp-radius: 12px;
+  --fp-border-width: 1px;
+  --fp-letter-spacing: -0.01em;
+}
+
+/* ---------- The Heritage ---------- cream + forest + burgundy ---------- */
+:root[data-vibe='The Heritage'] {
+  --fp-bg: #FAF6EE;
+  --fp-surface: #F0E8D8;
+  --fp-warm-1: #E8D9B8;
+  --fp-cool-1: #1A3A2E;
+  --fp-accent: #722F37;
+
+  --fp-ink: #1A2C2A;
+  --fp-muted: #4A5C58;
+
+  --fp-on-bg:        #1A2C2A;  --fp-on-bg-muted:        #4A5C58;
+  --fp-on-surface:   #1A2C2A;  --fp-on-surface-muted:   #4A5C58;
+  --fp-on-warm:      #1A2C2A;  --fp-on-warm-muted:      #4A5C58;
+  --fp-on-cool:      #FAF6EE;  --fp-on-cool-muted:      #C8D8D2;
+  --fp-on-accent:    #FAF6EE;
+
+  --fp-border-on-bg:      color-mix(in oklab, var(--fp-on-bg) 22%, transparent);
+  --fp-border-on-surface: color-mix(in oklab, var(--fp-on-surface) 22%, transparent);
+  --fp-border-on-warm:    color-mix(in oklab, var(--fp-on-warm) 22%, transparent);
+  --fp-border-on-cool:    color-mix(in oklab, var(--fp-on-cool) 35%, transparent);
+
+  --fp-font-display: 'Crimson Pro', 'Crimson Text', Georgia, serif;
+  --fp-font-body: 'Source Sans 3', 'Source Sans Pro', ui-sans-serif, system-ui, sans-serif;
+  --fp-radius: 4px;
+  --fp-border-width: 1px;
+  --fp-letter-spacing: 0;
+}
+
+/* ---------- Per-vibe component tweaks ---------- */
 :root[data-vibe='The Bold'] .fp-card {
   border-width: 2px;
   box-shadow: 4px 4px 0 0 var(--fp-accent);
 }
 :root[data-vibe='The Bold'] .fp-button {
   border-width: 2px;
-  border-color: color-mix(in oklab, var(--fp-accent) 60%, var(--fp-ink) 40%);
+  border-color: color-mix(in oklab, var(--fp-accent) 60%, var(--fp-on-accent) 40%);
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }
 
 :root[data-vibe='The Professional'] .fp-card {
-  box-shadow: 0 1px 2px 0 color-mix(in oklab, var(--fp-ink) 8%, transparent),
-              0 4px 12px -2px color-mix(in oklab, var(--fp-ink) 6%, transparent);
+  box-shadow: 0 1px 2px 0 color-mix(in oklab, var(--fp-on-bg) 8%, transparent),
+              0 4px 12px -2px color-mix(in oklab, var(--fp-on-bg) 6%, transparent);
 }
 
 :root[data-vibe='The Modern'] .fp-card {
@@ -81,4 +302,53 @@
   border-radius: 999px;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
+}
+
+:root[data-vibe='The Artisan'] .fp-card {
+  border-color: color-mix(in oklab, var(--fp-accent) 35%, transparent);
+}
+
+:root[data-vibe='The Wellness'] .fp-card {
+  border-radius: 16px;
+  border-color: color-mix(in oklab, var(--fp-accent) 25%, transparent);
+}
+:root[data-vibe='The Wellness'] .fp-button {
+  border-radius: 999px;
+}
+
+:root[data-vibe='The Editorial'] .fp-card {
+  border-radius: 0;
+  border-left: 4px solid var(--fp-accent);
+}
+:root[data-vibe='The Editorial'] .fp-button {
+  border-radius: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+:root[data-vibe='The Luxe'] .fp-card {
+  border-color: color-mix(in oklab, var(--fp-accent) 50%, transparent);
+  box-shadow: 0 1px 0 0 color-mix(in oklab, var(--fp-accent) 30%, transparent);
+}
+:root[data-vibe='The Luxe'] .fp-button {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+:root[data-vibe='The Tech'] .fp-card {
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 color-mix(in oklab, var(--fp-on-bg) 6%, transparent),
+              0 8px 24px -8px color-mix(in oklab, var(--fp-accent) 15%, transparent);
+}
+:root[data-vibe='The Tech'] .fp-button {
+  border-radius: 8px;
+}
+
+:root[data-vibe='The Heritage'] .fp-card {
+  border-color: color-mix(in oklab, var(--fp-accent) 30%, transparent);
+  border-radius: 4px;
+}
+:root[data-vibe='The Heritage'] .fp-button {
+  border-radius: 4px;
 }

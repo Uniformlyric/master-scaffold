@@ -1,4 +1,4 @@
-import type { BuildType, Vibe } from './zod.js';
+import type { BuildType, Section, Vibe } from './zod.js';
 
 export interface BuildTypeMeta {
   type: BuildType;
@@ -12,9 +12,7 @@ export interface BuildTypeMeta {
   defaultVibe: Vibe;
   requiresMigration: boolean;
   /** Recommended initial section order. */
-  defaultSections: ReadonlyArray<
-    'Hero' | 'Services' | 'Testimonials' | 'Pricing' | 'Contact' | 'SocialProof' | 'Logo' | 'Gallery' | 'BeforeAfter'
-  >;
+  defaultSections: ReadonlyArray<Section>;
 }
 
 export const BUILD_TYPE_META: Readonly<Record<BuildType, BuildTypeMeta>> = {

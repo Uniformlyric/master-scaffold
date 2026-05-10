@@ -1,0 +1,44 @@
+---
+import { siteDna } from '../../lib/siteDna';
+import Icon from '../Icon.astro';
+
+const name = siteDna.businessInfo.name ?? 'us';
+---
+
+<section
+  class="fp-section py-20 md:py-24 fp-tone-accent"
+  style="margin-bottom: 0;"
+  data-reveal
+>
+  <div class="mx-auto max-w-3xl text-center">
+    <h2
+      class="font-display text-3xl font-bold md:text-5xl"
+      style="color: var(--fp-on-accent)"
+    >
+      Ready to work with {name}?
+    </h2>
+    <p
+      class="mx-auto mt-4 max-w-xl text-base md:text-lg"
+      style="color: color-mix(in oklab, var(--fp-on-accent) 90%, transparent);"
+    >
+      Get a free, no-obligation quote in 24 hours. No spam, no high-pressure sales.
+    </p>
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+      <a
+        href="#contact"
+        class="inline-flex items-center justify-center px-6 py-3 font-semibold transition-transform hover:-translate-y-0.5"
+        style="background: var(--fp-on-accent); color: var(--fp-accent); border-radius: var(--fp-radius);"
+      >
+        Get a free quote
+        <Icon name="arrow" size={18} class="ml-2" />
+      </a>
+      <a
+        href="#services"
+        class="inline-flex items-center justify-center px-6 py-3 font-semibold"
+        style="border: 2px solid var(--fp-on-accent); color: var(--fp-on-accent); border-radius: var(--fp-radius);"
+      >
+        See services
+      </a>
+    </div>
+  </div>
+</section>

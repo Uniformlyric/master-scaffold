@@ -1,0 +1,53 @@
+---
+/*
+ * Vibe-aware section divider: a thin curved SVG that visually softens the
+ * transition between two adjacent tones.
+ *
+ * Renders only when the previous and current tone differ. The fill color
+ * matches the PREVIOUS section's background so the curve looks like the
+ * previous tone is flowing down into the current one.
+ *
+ * Editorial / Heritage prefer hard edges and skip the divider entirely.
+ */
+interface Props {
+  /** Tone class of the section ABOVE this one (e.g. 'fp-tone-bg'). */
+  prevTone?: string;
+  /** Current vibe; used to pick curve style. */
+  vibe: string;
+}
+
+const { prevTone, vibe } = Astro.props;
+
+const TONE_VAR: Record<string, string> = {
+  'fp-tone-bg': 'var(--fp-bg)',
+  'fp-tone-surface': 'var(--fp-surface)',
+  'fp-tone-warm-1': 'var(--fp-warm-1, var(--fp-surface))',
+  'fp-tone-cool-1': 'var(--fp-cool-1, var(--fp-bg))',
+};
+
+const previousFill = prevTone ? TONE_VAR[prevTone] ?? 'transparent' : 'transparent';
+const sharpEdges = vibe === 'The Editorial' || vibe === 'The Heritage';
+
+const useDiagonal = vibe === 'The Bold' || vibe === 'The Tech';
+---
+
+{!sharpEdges && prevTone && (
+  <div
+    aria-hidden="true"
+    class="block w-full overflow-hidden"
+    style={`height: 48px; line-height: 0; background: transparent;`}
+  >
+    <svg
+      viewBox="0 0 1440 48"
+      preserveAspectRatio="none"
+      class="block h-full w-full"
+      style={`color: ${previousFill};`}
+    >
+      {useDiagonal ? (
+        <path d="M0,0 L1440,0 L1440,30 L0,48 Z" fill="currentColor" />
+      ) : (
+        <path d="M0,0 L1440,0 L1440,12 C1080,48 360,0 0,36 Z" fill="currentColor" />
+      )}
+    </svg>
+  </div>
+)}

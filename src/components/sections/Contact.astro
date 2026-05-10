@@ -1,50 +1,122 @@
 ---
 import { siteDna } from '../../lib/siteDna';
+import { defaultContactInfo } from '../../lib/defaults';
+import Icon from '../Icon.astro';
+
 const { businessInfo } = siteDna;
+const contact = defaultContactInfo(businessInfo);
+const name = businessInfo.name ?? 'us';
 ---
 
-<section id="contact" class="fp-section">
-  <div class="fp-card">
-    <h2 class="font-display text-3xl font-semibold md:text-4xl" style="color: var(--fp-ink)">
-      Get in touch
-    </h2>
-    <p class="mt-2" style="color: var(--fp-muted)">
-      Reach out to {businessInfo.name ?? 'us'} and we&rsquo;ll respond within one business day.
-    </p>
+<section id="contact" class="fp-section" data-reveal>
+  <div class="grid gap-10 md:grid-cols-12">
+    <div class="md:col-span-7">
+      <div class="fp-card">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--fp-accent)">
+          Get in touch
+        </p>
+        <h2
+          class="mt-3 font-display text-3xl font-semibold md:text-4xl"
+          style="color: var(--fp-ink)"
+        >
+          Tell us about your project
+        </h2>
+        <p class="mt-3 text-base" style="color: var(--fp-muted)">
+          Reach out to {name} and we&rsquo;ll respond within one business day.
+        </p>
 
-    <form class="mt-8 grid gap-4 md:grid-cols-2" method="post" action="#">
-      <label class="flex flex-col gap-1 text-sm" style="color: var(--fp-muted)">
-        Name
-        <input
-          name="name"
-          required
-          class="rounded-md border bg-transparent px-3 py-2"
-          style="border-color: color-mix(in oklab, var(--fp-ink) 20%, transparent); color: var(--fp-ink)"
-        />
-      </label>
-      <label class="flex flex-col gap-1 text-sm" style="color: var(--fp-muted)">
-        Email
-        <input
-          type="email"
-          name="email"
-          required
-          class="rounded-md border bg-transparent px-3 py-2"
-          style="border-color: color-mix(in oklab, var(--fp-ink) 20%, transparent); color: var(--fp-ink)"
-        />
-      </label>
-      <label class="md:col-span-2 flex flex-col gap-1 text-sm" style="color: var(--fp-muted)">
-        How can we help?
-        <textarea
-          name="message"
-          rows="5"
-          required
-          class="rounded-md border bg-transparent px-3 py-2"
-          style="border-color: color-mix(in oklab, var(--fp-ink) 20%, transparent); color: var(--fp-ink)"
-        />
-      </label>
-      <div class="md:col-span-2">
-        <button type="submit" class="fp-button">Send message</button>
+        <form class="mt-8 grid gap-4 md:grid-cols-2" method="post" action="#">
+          <label class="flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
+            <span>Name</span>
+            <input name="name" required class="fp-input" autocomplete="name" />
+          </label>
+          <label class="flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
+            <span>Email</span>
+            <input type="email" name="email" required class="fp-input" autocomplete="email" />
+          </label>
+          <label class="flex flex-col gap-1.5 text-sm font-medium md:col-span-2" style="color: var(--fp-ink)">
+            <span>Phone (optional)</span>
+            <input type="tel" name="phone" class="fp-input" autocomplete="tel" />
+          </label>
+          <label class="md:col-span-2 flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
+            <span>How can we help?</span>
+            <textarea
+              name="message"
+              rows="5"
+              required
+              class="fp-input"
+              style="resize: vertical;"
+            />
+          </label>
+          <div class="md:col-span-2 flex flex-wrap items-center justify-between gap-4">
+            <p class="text-xs" style="color: var(--fp-muted)">
+              We respect your privacy. No spam, ever.
+            </p>
+            <button type="submit" class="fp-button">
+              Send message
+              <Icon name="arrow" size={16} class="ml-2" />
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
+
+    <aside class="md:col-span-5">
+      <div class="fp-card flex h-full flex-col">
+        <h3 class="font-display text-xl font-semibold" style="color: var(--fp-ink)">
+          Other ways to reach {name}
+        </h3>
+
+        <ul class="mt-6 space-y-4 text-sm">
+          <li class="flex items-start gap-3">
+            <span style="color: var(--fp-accent)"><Icon name="phone" size={18} /></span>
+            <div>
+              <p class="font-semibold" style="color: var(--fp-ink)">Phone</p>
+              <a href={contact.phoneHref} class="hover:underline" style="color: var(--fp-muted)">
+                {contact.phone}
+              </a>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span style="color: var(--fp-accent)"><Icon name="mail" size={18} /></span>
+            <div>
+              <p class="font-semibold" style="color: var(--fp-ink)">Email</p>
+              <a href={contact.emailHref} class="hover:underline" style="color: var(--fp-muted)">
+                {contact.email}
+              </a>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span style="color: var(--fp-accent)"><Icon name="clock" size={18} /></span>
+            <div>
+              <p class="font-semibold" style="color: var(--fp-ink)">Hours</p>
+              <p style="color: var(--fp-muted)">{contact.hours}</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span style="color: var(--fp-accent)"><Icon name="pin" size={18} /></span>
+            <div>
+              <p class="font-semibold" style="color: var(--fp-ink)">Service area</p>
+              <p style="color: var(--fp-muted)">{contact.address}</p>
+            </div>
+          </li>
+        </ul>
+
+        <div
+          class="mt-6 flex aspect-[5/3] items-center justify-center"
+          style="background:
+            linear-gradient(135deg, color-mix(in oklab, var(--fp-accent) 22%, transparent), color-mix(in oklab, var(--fp-warm-1, var(--fp-accent)) 22%, transparent)),
+            color-mix(in oklab, var(--fp-ink) 8%, transparent);
+            border: var(--fp-border-width) solid var(--fp-border-color);
+            border-radius: var(--fp-radius);
+            color: var(--fp-muted);"
+        >
+          <span class="flex items-center gap-2 text-xs uppercase tracking-widest">
+            <Icon name="pin" size={16} />
+            Map placeholder
+          </span>
+        </div>
+      </div>
+    </aside>
   </div>
 </section>

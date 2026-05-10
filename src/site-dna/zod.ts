@@ -1,6 +1,16 @@
 import { z } from 'zod';
 
-export const VibeEnum = z.enum(['The Bold', 'The Professional', 'The Modern']);
+export const VibeEnum = z.enum([
+  'The Bold',
+  'The Professional',
+  'The Modern',
+  'The Artisan',
+  'The Wellness',
+  'The Editorial',
+  'The Luxe',
+  'The Tech',
+  'The Heritage',
+]);
 
 export const SectionEnum = z.enum([
   'Hero',
@@ -12,7 +22,11 @@ export const SectionEnum = z.enum([
   'Logo',
   'Gallery',
   'BeforeAfter',
+  'ValueProps',
+  'FAQ',
 ]);
+
+export const ProvisioningModeEnum = z.enum(['shared', 'isolated']);
 
 export const LeadStatusEnum = z.enum([
   'Discovery',
@@ -268,6 +282,15 @@ export const ProvisioningStepSchema = z.object({
 
 export const ProvisioningSchema = z.object({
   status: ProvisioningOverallStatusEnum.default('idle'),
+  /**
+   * Provisioning mode:
+   *  - 'shared'   -> use the shared `flashpoint-demo` Firebase project
+   *                  (skips isolation_handshake, never burns the GCP 5/day quota).
+   *                  This is the default so prospect demos are unlimited.
+   *  - 'isolated' -> create a per-lead Firebase project via isolation_handshake.
+   *                  Use only when promoting a lead to a paying client.
+   */
+  mode: ProvisioningModeEnum.default('shared'),
   runId: z.string().optional(),
   repo: z.string().optional(),
   pagesProject: z.string().optional(),
@@ -337,6 +360,7 @@ export type ContentLogo = z.infer<typeof ContentLogoEnum>;
 export type HistoryKind = z.infer<typeof HistoryKindEnum>;
 export type ProvisioningStepStatus = z.infer<typeof ProvisioningStepStatusEnum>;
 export type ProvisioningOverallStatus = z.infer<typeof ProvisioningOverallStatusEnum>;
+export type ProvisioningMode = z.infer<typeof ProvisioningModeEnum>;
 
 export type Service = z.infer<typeof ServiceSchema>;
 export type BusinessInfo = z.infer<typeof BusinessInfoSchema>;

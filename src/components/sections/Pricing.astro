@@ -1,38 +1,74 @@
 ---
 import { siteDna } from '../../lib/siteDna';
-const services = (siteDna.businessInfo.services ?? []).filter((s) => Boolean(s.priceLabel));
+import { defaultPricingTiers, realOrDefaultServices } from '../../lib/defaults';
+import Icon from '../Icon.astro';
+
+const services = realOrDefaultServices(siteDna.businessInfo);
+const tiers = defaultPricingTiers(siteDna.businessInfo, services);
 ---
 
-<section id="pricing" class="fp-section">
-  <h2 class="font-display text-3xl font-semibold md:text-4xl" style="color: var(--fp-ink)">
-    Pricing
-  </h2>
-  <p class="mt-2" style="color: var(--fp-muted)">Transparent starting prices. No surprises.</p>
+<section id="pricing" class="fp-section" data-reveal>
+  <div class="mx-auto max-w-2xl text-center">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--fp-accent)">
+      Simple pricing
+    </p>
+    <h2
+      class="mt-3 font-display text-3xl font-semibold md:text-4xl lg:text-5xl"
+      style="color: var(--fp-ink)"
+    >
+      Transparent. Up front. No surprises.
+    </h2>
+    <p class="mt-4 text-base md:text-lg" style="color: var(--fp-muted)">
+      Pick a tier or call us for a custom quote. We do the math, you get the price.
+    </p>
+  </div>
 
-  <div class="mt-10 grid gap-6 md:grid-cols-3">
-    {
-      services.length === 0 ? (
-        <p class="fp-card" style="color: var(--fp-muted)">
-          Pricing coming soon.
+  <div class="mt-12 grid gap-6 md:grid-cols-3">
+    {tiers.map((tier) => (
+      <article
+        class={`fp-card relative flex h-full flex-col ${tier.highlight ? 'md:scale-[1.03] md:shadow-2xl' : ''}`}
+        style={tier.highlight
+          ? `border-width: 2px; border-color: var(--fp-accent); background: color-mix(in oklab, var(--fp-accent) 6%, transparent);`
+          : ''}
+      >
+        {tier.highlight && (
+          <span
+            class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-[11px] font-bold uppercase tracking-widest"
+            style="background: var(--fp-accent); color: var(--fp-on-accent); border-radius: var(--fp-radius);"
+          >
+            Most Popular
+          </span>
+        )}
+
+        <h3 class="font-display text-xl font-semibold" style="color: var(--fp-ink)">
+          {tier.name}
+        </h3>
+        <p class="mt-2 text-sm" style="color: var(--fp-muted)">
+          {tier.description}
         </p>
-      ) : (
-        services.map((service) => (
-          <article class="fp-card flex flex-col">
-            <h3 class="font-display text-lg font-semibold" style="color: var(--fp-ink)">
-              {service.title}
-            </h3>
-            <p class="mt-1 text-sm" style="color: var(--fp-muted)">
-              {service.description}
-            </p>
-            <p class="mt-6 text-3xl font-bold" style="color: var(--fp-accent)">
-              {service.priceLabel}
-            </p>
-            <a href="#contact" class="fp-button mt-6 self-start">
-              Book this
-            </a>
-          </article>
-        ))
-      )
-    }
+
+        <p class="mt-6 font-display text-3xl font-bold md:text-4xl" style="color: var(--fp-accent)">
+          {tier.priceLabel}
+        </p>
+
+        <ul class="mt-6 flex-1 space-y-3 text-sm">
+          {tier.features.map((f) => (
+            <li class="flex items-start gap-2" style="color: var(--fp-ink)">
+              <span class="mt-0.5" style="color: var(--fp-accent)">
+                <Icon name="check" size={16} strokeWidth={2.5} />
+              </span>
+              <span>{f}</span>
+            </li>
+          ))}
+        </ul>
+
+        <a
+          href="#contact"
+          class={tier.highlight ? 'fp-button mt-8' : 'fp-button-outline mt-8'}
+        >
+          {tier.ctaLabel}
+        </a>
+      </article>
+    ))}
   </div>
 </section>

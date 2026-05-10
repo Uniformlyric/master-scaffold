@@ -1,26 +1,30 @@
 ---
 import { siteDna } from '../../lib/siteDna';
+import { businessInitials } from '../../lib/defaults';
+
 const logo = siteDna.assets.logo;
 const name = siteDna.businessInfo.name ?? '';
+const initials = businessInitials(siteDna.businessInfo);
 ---
 
-<section class="fp-section">
+<section class="fp-section py-12" data-reveal>
   <div class="flex flex-col items-center gap-3 text-center">
-    {
-      logo ? (
-        <img
-          src={logo.downloadURL}
-          alt={logo.alt ?? `${name} logo`}
-          class="h-24 w-auto"
-          width={logo.width}
-          height={logo.height}
-        />
-      ) : (
-        <div class="rounded-md border-2 border-dashed px-6 py-3 text-xs uppercase tracking-widest" style="border-color: var(--fp-muted); color: var(--fp-muted)">
-          Logo placeholder
-        </div>
-      )
-    }
+    {logo ? (
+      <img
+        src={logo.downloadURL}
+        alt={logo.alt ?? `${name} logo`}
+        class="h-20 w-auto"
+        width={logo.width}
+        height={logo.height}
+      />
+    ) : (
+      <span
+        class="flex h-20 w-20 items-center justify-center font-display text-2xl font-bold"
+        style="background: color-mix(in oklab, var(--fp-accent) 18%, transparent); color: var(--fp-accent); border-radius: var(--fp-radius);"
+      >
+        {initials}
+      </span>
+    )}
     {name && (
       <p class="font-display text-lg" style="color: var(--fp-ink)">
         {name}

@@ -9,6 +9,9 @@ import SocialProof from './sections/SocialProof.astro';
 import Logo from './sections/Logo.astro';
 import Gallery from './sections/Gallery.astro';
 import BeforeAfter from './sections/BeforeAfter.astro';
+import ValueProps from './sections/ValueProps.astro';
+import FAQ from './sections/FAQ.astro';
+import SectionDivider from './SectionDivider.astro';
 import { shouldUseGradient, toneClassForIndex } from '../lib/multiTone';
 import { siteDna } from '../lib/siteDna';
 import { meshGradientFor } from '../lib/meshGradient';
@@ -16,20 +19,24 @@ import { meshGradientFor } from '../lib/meshGradient';
 interface Props {
   section: Section;
   index: number;
+  prevTone?: string;
 }
 
-const { section, index } = Astro.props;
+const { section, index, prevTone } = Astro.props;
 const tone = toneClassForIndex(index);
 const useGradient = shouldUseGradient(section, index)
   && (siteDna.designTokens.animations?.enableGradients ?? true);
 const useMesh = useGradient && siteDna.designTokens.vibe === 'The Modern';
 const meshStyle = useMesh ? `background: ${meshGradientFor(siteDna.designTokens.multiTonePalette)};` : '';
+const vibe = siteDna.designTokens.vibe;
+const showDivider = prevTone && prevTone !== tone;
 ---
 
 <div
-  class:list={[tone, useGradient && !useMesh && 'fp-gradient']}
+  class:list={[tone, useGradient && !useMesh && 'fp-gradient', 'fp-section-wrap']}
   style={meshStyle}
 >
+  {showDivider && <SectionDivider prevTone={prevTone} vibe={vibe} />}
   {section === 'Hero' && <Hero />}
   {section === 'Services' && <Services />}
   {section === 'Testimonials' && <Testimonials />}
@@ -39,4 +46,6 @@ const meshStyle = useMesh ? `background: ${meshGradientFor(siteDna.designTokens.
   {section === 'Logo' && <Logo />}
   {section === 'Gallery' && <Gallery />}
   {section === 'BeforeAfter' && <BeforeAfter />}
+  {section === 'ValueProps' && <ValueProps />}
+  {section === 'FAQ' && <FAQ />}
 </div>

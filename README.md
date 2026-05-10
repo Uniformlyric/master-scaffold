@@ -10,20 +10,17 @@ pnpm --filter master-scaffold dev
 
 ### Standalone `npm` / Cloudflare (lockfile)
 
-This folder keeps a root **`package-lock.json`** for template repos built with **`npm ci`** on Cloudflare. Regenerate it with HTTPS-only GitHub URLs (avoid `git+ssh` in the lockfile):
+This folder keeps a root **`package-lock.json`** for template repos built with **`npm ci`** on Cloudflare. The schema is vendored at `src/site-dna/`, so the lockfile only contains npm-registry packages (no git dependencies):
 
 ```sh
-export GIT_CONFIG_GLOBAL="$PWD/gitconfig-for-lockfile"
 rm -rf node_modules package-lock.json
 npm install
 ```
 
-On Windows PowerShell: `$env:GIT_CONFIG_GLOBAL = "$PWD\gitconfig-for-lockfile"` then the same `npm install`.
-
 ## How the site customizes itself
 
 1. The orchestrator writes a fully populated `site-dna.json` into the new repo before the first build.
-2. `src/lib/siteDna.ts` parses + validates it via `@flashpoint/site-dna`.
+2. `src/lib/siteDna.ts` parses + validates it via the vendored `src/site-dna/` schema (kept in sync with `packages/site-dna` in `Uniformlyric/project-flashpoint`).
 3. `Layout.astro` reads `designTokens.vibe` and applies `<html data-vibe="...">` so the matching CSS variable preset in `src/styles/vibes.css` activates.
 4. `SectionRenderer.astro` switches on each value in `layout.sectionOrder` and mounts the corresponding section component.
 

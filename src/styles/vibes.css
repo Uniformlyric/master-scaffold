@@ -1,18 +1,38 @@
 /*
- * Vibe presets per Project Flashpoint v1.9 brief, expanded for the
- * closing-asset polish pass.
+ * vibes.css - LEGACY FLAT-VIBE RENDERING (dormant under NM signature)
+ * ----------------------------------------------------------------
+ * Under the Nuzum Method signature (the default), THIS FILE IS DORMANT.
+ * `signature.css` declares `:root[data-signature='nuzum-method']` plus
+ * `:root[data-signature='nuzum-method'][data-vibe='X']` blocks at higher
+ * specificity, AND ships a --fp-* compatibility shim that re-binds every
+ * legacy --fp-* token to its --nm-* equivalent. So when
+ * `data-signature='nuzum-method'` is on `<html>` (the default for every new
+ * lead via flashpoint-app/src/lib/leadDefaults.ts), the values below are
+ * shadowed at runtime.
  *
- * Each vibe declares:
+ * The single authoritative TypeScript source for per-vibe flavor (leaks,
+ * accent, display + italic font picks, accent behavior copy) is
+ * `packages/site-dna/src/vibeFlavor.ts`. Keep that file in lockstep with
+ * `signature.css` per-vibe NM flavor blocks.
+ *
+ * Why this file still exists:
+ *   1. `scripts/check-contrast.mjs` PASS 1 audits the legacy --fp-* tokens
+ *      defined here. Removing the file would silently delete one of the two
+ *      contrast guards. The plan keeps the door open for a future
+ *      `data-signature='classic'` value that re-enables flat-vibe rendering
+ *      using these exact tokens.
+ *   2. Some lead exports / printable summaries still reference the old
+ *      --fp-bg, --fp-accent vocabulary at HTML attribute level.
+ *
+ * What each vibe block declares:
  *   1. Palette tokens          (--fp-bg / -surface / -warm-1 / -cool-1 / -accent)
- *   2. Default ink + muted     (--fp-ink / --fp-muted) - used when no tone class
- *   3. Per-tone contrast tokens (--fp-on-bg, --fp-on-surface, ...) so .fp-tone-*
- *      classes in global.css can re-bind --fp-ink / --fp-muted / --fp-border-color
- *      to a WCAG AA-clearing pair on every band.
- *   4. Border-on-tone tokens   (--fp-border-on-*) for cards / inputs
+ *   2. Default ink + muted     (--fp-ink / --fp-muted)
+ *   3. Per-tone contrast tokens (--fp-on-bg, --fp-on-surface, ...)
+ *   4. Border-on-tone tokens   (--fp-border-on-*)
  *   5. Typography + radius / border / letter-spacing
  *
- * scripts/check-contrast.mjs verifies every text/background pair >= WCAG AA at
- * `npm run prebuild` time. Do not ship a vibe that fails the check.
+ * `scripts/check-contrast.mjs` verifies every text/background pair >= WCAG AA
+ * at `npm run prebuild` time. Do not ship a vibe block that fails the check.
  */
 
 /* ---------- The Bold ---------- dark navy + cream + orange ---------- */
@@ -39,17 +59,17 @@
 
   --fp-font-display: 'Archivo Black', ui-sans-serif, system-ui, sans-serif;
   --fp-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --fp-radius: 0px;
-  --fp-border-width: 2px;
-  --fp-letter-spacing: -0.01em;
+  /* Structural tokens (--fp-radius, --fp-border-width, --fp-letter-spacing)
+   * are owned by signature.css under NM. Don't redeclare here.
+   */
 }
 
-/* ---------- The Professional ---------- warm white + slate + blue ---------- */
+/* ---------- The Professional ---------- cool slate paper + slate + blue ---------- */
 :root[data-vibe='The Professional'] {
-  --fp-bg: #FAF9F6;
-  --fp-surface: #F5EFE0;
-  --fp-warm-1: #FFFDD0;
-  --fp-cool-1: #E8DCC4;
+  --fp-bg: #ECEEEF;
+  --fp-surface: #E2E6E9;
+  --fp-warm-1: #F0EFE8;
+  --fp-cool-1: #D8DCE0;
   --fp-accent: #1D4ED8;
 
   --fp-ink: #1F2937;
@@ -68,9 +88,6 @@
 
   --fp-font-display: 'Source Serif 4', Georgia, serif;
   --fp-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --fp-radius: 8px;
-  --fp-border-width: 1px;
-  --fp-letter-spacing: 0;
 }
 
 /* ---------- The Modern ---------- midnight + cyan + jakarta ---------- */
@@ -97,17 +114,14 @@
 
   --fp-font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
   --fp-font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-  --fp-radius: 24px;
-  --fp-border-width: 0px;
-  --fp-letter-spacing: -0.005em;
 }
 
-/* ---------- The Artisan ---------- cream + clay + terracotta ---------- */
+/* ---------- The Artisan ---------- clay-tinted paper + clay + terracotta ---------- */
 :root[data-vibe='The Artisan'] {
-  --fp-bg: #FFF8EC;
-  --fp-surface: #F5E6D3;
-  --fp-warm-1: #E8C9A5;
-  --fp-cool-1: #D9C9B5;
+  --fp-bg: #F2E8DA;
+  --fp-surface: #E8D5BC;
+  --fp-warm-1: #E0C49C;
+  --fp-cool-1: #C9B69E;
   --fp-accent: #B8542F;
 
   --fp-ink: #3D2817;
@@ -126,17 +140,14 @@
 
   --fp-font-display: 'Fraunces', Georgia, serif;
   --fp-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --fp-radius: 4px;
-  --fp-border-width: 1px;
-  --fp-letter-spacing: 0;
 }
 
-/* ---------- The Wellness ---------- sage + blush + cream ---------- */
+/* ---------- The Wellness ---------- sage-tinted paper + sage + blush ---------- */
 :root[data-vibe='The Wellness'] {
-  --fp-bg: #FAF6F2;
-  --fp-surface: #E8F0E5;
-  --fp-warm-1: #F4E4DD;
-  --fp-cool-1: #D4E5D9;
+  --fp-bg: #EDEEE6;
+  --fp-surface: #DCE6DA;
+  --fp-warm-1: #E6D2CC;
+  --fp-cool-1: #C9D8CC;
   --fp-accent: #4F6F3F;
 
   --fp-ink: #1F3320;
@@ -155,16 +166,13 @@
 
   --fp-font-display: 'Quicksand', ui-sans-serif, system-ui, sans-serif;
   --fp-font-body: 'Nunito', ui-sans-serif, system-ui, sans-serif;
-  --fp-radius: 16px;
-  --fp-border-width: 1px;
-  --fp-letter-spacing: 0;
 }
 
-/* ---------- The Editorial ---------- paper + ink + accent red ---------- */
+/* ---------- The Editorial ---------- gallery paper + ink + accent red ---------- */
 :root[data-vibe='The Editorial'] {
-  --fp-bg: #FAFAFA;
-  --fp-surface: #F0F0F0;
-  --fp-warm-1: #E8E0D0;
+  --fp-bg: #ECECEC;
+  --fp-surface: #E0E0E0;
+  --fp-warm-1: #D8D0C0;
   --fp-cool-1: #1A1A1A;
   --fp-accent: #B0102A;
 
@@ -184,9 +192,6 @@
 
   --fp-font-display: 'Playfair Display', Georgia, serif;
   --fp-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --fp-radius: 0px;
-  --fp-border-width: 1px;
-  --fp-letter-spacing: -0.01em;
 }
 
 /* ---------- The Luxe ---------- black + gold + ivory ---------- */
@@ -213,17 +218,14 @@
 
   --fp-font-display: 'Cormorant Garamond', 'Cormorant', Georgia, serif;
   --fp-font-body: 'Lato', ui-sans-serif, system-ui, sans-serif;
-  --fp-radius: 2px;
-  --fp-border-width: 1px;
-  --fp-letter-spacing: 0.02em;
 }
 
-/* ---------- The Tech ---------- white + indigo + space grotesk ---------- */
+/* ---------- The Tech ---------- cool ivory + indigo + space grotesk ---------- */
 :root[data-vibe='The Tech'] {
-  --fp-bg: #FAFBFC;
-  --fp-surface: #F0F4FA;
-  --fp-warm-1: #E8EDF5;
-  --fp-cool-1: #E0E8F5;
+  --fp-bg: #ECEEF0;
+  --fp-surface: #E0E6EC;
+  --fp-warm-1: #D8DFE9;
+  --fp-cool-1: #CFD8E5;
   --fp-accent: #4338CA;
 
   --fp-ink: #0F172A;
@@ -242,16 +244,13 @@
 
   --fp-font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
   --fp-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --fp-radius: 12px;
-  --fp-border-width: 1px;
-  --fp-letter-spacing: -0.01em;
 }
 
-/* ---------- The Heritage ---------- cream + forest + burgundy ---------- */
+/* ---------- The Heritage ---------- burgundy-tinted cream + forest + burgundy ---------- */
 :root[data-vibe='The Heritage'] {
-  --fp-bg: #FAF6EE;
-  --fp-surface: #F0E8D8;
-  --fp-warm-1: #E8D9B8;
+  --fp-bg: #F0E8D8;
+  --fp-surface: #E6DAC2;
+  --fp-warm-1: #DCC8A0;
   --fp-cool-1: #1A3A2E;
   --fp-accent: #722F37;
 
@@ -271,9 +270,6 @@
 
   --fp-font-display: 'Crimson Pro', 'Crimson Text', Georgia, serif;
   --fp-font-body: 'Source Sans 3', 'Source Sans Pro', ui-sans-serif, system-ui, sans-serif;
-  --fp-radius: 4px;
-  --fp-border-width: 1px;
-  --fp-letter-spacing: 0;
 }
 
 /* ---------- Per-vibe component tweaks ---------- */

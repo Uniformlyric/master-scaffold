@@ -28,6 +28,54 @@ export const SectionEnum = z.enum([
 
 export const ProvisioningModeEnum = z.enum(['shared', 'isolated']);
 
+/**
+ * Visual signature system.
+ *
+ * 'nuzum-method' is the only signature today and the default for all new leads.
+ * It defines the dark obsidian + moss base, light-leak rendering rules,
+ * river-stone geometry, technical-serif type system, heavy-drift motion,
+ * exposed-blueprint labels and cinematic-masked photos.
+ *
+ * Vibes paint within this signature; layout shells compose within it.
+ *
+ * The enum is structured so a future 'classic' value could re-enable the
+ * original flat-vibe rendering by adding one CSS block keyed on
+ * `[data-signature='classic']`.
+ */
+export const SignatureEnum = z.enum(['nuzum-method']);
+
+/**
+ * The 12 layout shells. Shell != component; shell is a composition recipe
+ * that decides which variant of each section to render and how they overlap.
+ *
+ * - stack       N°01  Vertical narrative, peel-overlapping cards. Default fallback.
+ * - atrium      N°02  Centered serif italic statement hero, sections fan out staggered.
+ * - ledger      N°03  Editorial spread, type-led hero, multi-column body, sidebar metadata.
+ * - vitrine     N°04  Gallery-first, hero IS masked photo grid in leak field.
+ * - workshop    N°05  Maximum intentional clutter above fold.
+ * - marquee     N°06  Giant display headline fills viewport, manifesto poster.
+ * - drift       N°07  Maximum motion, multi-layer parallax hero, animated leaks.
+ * - cabinet     N°08  Dense tile-grid first, tiny hero.
+ * - letterhead  N°09  Maximum restraint, mostly type + one masked pill photo.
+ * - foyer       N°10  Split hero (type left / masked photo right), asymmetric balance.
+ * - portico     N°11  Heaviest blueprint labeling, numbered sections w/ exposed rules.
+ * - cascade     N°12  Cinematic top-down reveal, strong peel + drift between sections.
+ */
+export const LayoutShellEnum = z.enum([
+  'stack',
+  'atrium',
+  'ledger',
+  'vitrine',
+  'workshop',
+  'marquee',
+  'drift',
+  'cabinet',
+  'letterhead',
+  'foyer',
+  'portico',
+  'cascade',
+]);
+
 export const LeadStatusEnum = z.enum([
   'Discovery',
   'Demo Generated',
@@ -197,6 +245,18 @@ export const TypographySchema = z.object({
 
 export const DesignTokensSchema = z.object({
   vibe: VibeEnum,
+  /**
+   * Visual signature. Always defaults to 'nuzum-method'. Existing leads
+   * pre-dating the Nuzum Method rollout get this backfilled on Zod parse,
+   * no migration script required.
+   */
+  signature: SignatureEnum.default('nuzum-method'),
+  /**
+   * Layout shell. Optional - absence means "Auto" (resolved from vibe via
+   * `layoutShellForVibe(vibe)` at render time). Pre-existing leads keep
+   * working with no migration.
+   */
+  layoutShell: LayoutShellEnum.optional(),
   animations: AnimationsSchema.default({ enableGradients: true, reducedMotionFallback: true }),
   multiTonePalette: MultiTonePaletteSchema,
   typography: TypographySchema,
@@ -361,6 +421,8 @@ export type HistoryKind = z.infer<typeof HistoryKindEnum>;
 export type ProvisioningStepStatus = z.infer<typeof ProvisioningStepStatusEnum>;
 export type ProvisioningOverallStatus = z.infer<typeof ProvisioningOverallStatusEnum>;
 export type ProvisioningMode = z.infer<typeof ProvisioningModeEnum>;
+export type Signature = z.infer<typeof SignatureEnum>;
+export type LayoutShell = z.infer<typeof LayoutShellEnum>;
 
 export type Service = z.infer<typeof ServiceSchema>;
 export type BusinessInfo = z.infer<typeof BusinessInfoSchema>;

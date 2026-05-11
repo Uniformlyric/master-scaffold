@@ -1,37 +1,32 @@
 ---
 import { siteDna } from '../../lib/siteDna';
 import { defaultReviewBadges } from '../../lib/defaults';
+import { resolveShellMeta } from '../../lib/layoutShell';
 import Icon from '../Icon.astro';
 
 const badges = defaultReviewBadges(siteDna.businessInfo);
+const meta = resolveShellMeta(siteDna);
 ---
 
 <section class="fp-section py-12 md:py-16" data-reveal>
-  <p
-    class="text-center text-xs font-semibold uppercase tracking-[0.22em]"
-    style="color: var(--fp-muted)"
-  >
-    Trusted by neighbors and reviewers across the region
-  </p>
+  {meta.exposedRules && <hr class="nm-rule nm-rule--ticked mb-8" />}
 
   <div class="mx-auto mt-8 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4">
     {badges.map((b) => (
       <div
         class="flex items-center justify-center gap-2 px-4 py-3"
-        style="border: var(--fp-border-width) solid var(--fp-border-color); border-radius: var(--fp-radius);"
+        style="border: var(--fp-border-width) solid var(--fp-border-color); border-radius: var(--nm-radius-sm, var(--fp-radius));"
       >
-        <span class="flex" style="color: var(--fp-accent)">
+        <span class="flex" style="color: var(--nm-accent, var(--fp-accent))">
           <Icon name="star" size={14} />
         </span>
         <div class="text-left leading-tight">
-          <p class="text-sm font-semibold" style="color: var(--fp-ink)">
-            {b.score.toFixed(1)} {b.platform}
-          </p>
-          <p class="text-[11px] uppercase tracking-wide" style="color: var(--fp-muted)">
-            {b.count} reviews
-          </p>
+          <p class="text-sm font-semibold" style="color: var(--fp-ink)">{b.score.toFixed(1)} {b.platform}</p>
+          <p class="font-mono text-[10px] uppercase tracking-wide" style="color: var(--fp-muted)">{b.count} reviews</p>
         </div>
       </div>
     ))}
   </div>
+
+  {meta.exposedRules && <hr class="nm-rule nm-rule--ticked mt-8" />}
 </section>

@@ -2,6 +2,7 @@ export * from './zod.js';
 export * from './buildTypeMeta.js';
 export * from './palette.js';
 export * from './typography.js';
+export * from './layoutShell.js';
 
 import { LeadRecordSchema, SiteDNASchema, type LeadRecord, type SiteDNA } from './zod.js';
 

@@ -1,53 +1,151 @@
 ---
 /*
- * Vibe-aware section divider: a thin curved SVG that visually softens the
- * transition between two adjacent tones.
+ * Section divider - SVG slope/curve/torn-paper between two adjacent tones.
  *
- * Renders only when the previous and current tone differ. The fill color
- * matches the PREVIOUS section's background so the curve looks like the
- * previous tone is flowing down into the current one.
+ * The divider is the visual bridge between two sections. Under NM we no
+ * longer use a single curve for every transition - the shape adapts to
+ * the tone pair so high-contrast transitions (paper -> obsidian) read as
+ * a torn editorial edge, while same-luminance transitions (paper -> moss)
+ * read as a soft slope or a hairline.
  *
- * Editorial / Heritage prefer hard edges and skip the divider entirely.
+ * Variant picker (NM tones):
+ *   obsidian -> paper           : slope-up (paper fill drops into obsidian)
+ *   paper -> obsidian           : slope-down (obsidian fill rises into paper)
+ *   paper -> moss / moss -> paper : torn-paper edge
+ *   leak -> *                   : long curve
+ *   same-tone consecutive       : ticked hairline only
+ *
+ * The fill color matches the PREVIOUS section's background so the shape
+ * looks like the previous tone is flowing into the current.
  */
 interface Props {
-  /** Tone class of the section ABOVE this one (e.g. 'fp-tone-bg'). */
   prevTone?: string;
-  /** Current vibe; used to pick curve style. */
+  curTone?: string;
   vibe: string;
 }
 
-const { prevTone, vibe } = Astro.props;
+const { prevTone, curTone, vibe } = Astro.props;
 
-const TONE_VAR: Record<string, string> = {
-  'fp-tone-bg': 'var(--fp-bg)',
-  'fp-tone-surface': 'var(--fp-surface)',
-  'fp-tone-warm-1': 'var(--fp-warm-1, var(--fp-surface))',
-  'fp-tone-cool-1': 'var(--fp-cool-1, var(--fp-bg))',
+/*
+ * Map any tone class to a single tone name. Accepts both fp-tone-* and
+ * nm-tone-* class strings or bare names.
+ */
+function normalizeTone(t: string | undefined): string | undefined {
+  if (!t) return undefined;
+  const stripped = t.replace('nm-tone-', '').replace('fp-tone-', '');
+  /* Bucket vibe-paper-ish tones together. */
+  if (stripped === 'bg' || stripped === 'surface' || stripped === 'warm-1' || stripped === 'paper') return 'paper';
+  if (stripped === 'cool-1' || stripped === 'obsidian') return 'obsidian';
+  if (stripped === 'moss') return 'moss';
+  if (stripped === 'leak') return 'leak';
+  return stripped;
+}
+
+const prev = normalizeTone(prevTone);
+const cur = normalizeTone(curTone);
+
+const TONE_FILL: Record<string, string> = {
+  paper: 'var(--fp-bg)',
+  obsidian: 'var(--nm-obsidian, var(--fp-ink))',
+  moss: 'var(--nm-moss, var(--fp-surface))',
+  leak: 'color-mix(in oklab, var(--nm-leak-1, var(--fp-accent)) 22%, var(--fp-bg))',
 };
 
-const previousFill = prevTone ? TONE_VAR[prevTone] ?? 'transparent' : 'transparent';
-const sharpEdges = vibe === 'The Editorial' || vibe === 'The Heritage';
+const previousFill = prev ? TONE_FILL[prev] ?? 'var(--fp-bg)' : 'var(--fp-bg)';
 
-const useDiagonal = vibe === 'The Bold' || vibe === 'The Tech';
+/*
+ * Choose divider shape per (prev, cur) tone pair.
+ *
+ *  'slope-up'   - previous fills bottom-half of the SVG, taper to top right
+ *  'slope-down' - previous fills bottom-half, taper to top left
+ *  'curve'      - long S-curve
+ *  'torn'       - editorial torn-paper edge (multi-point path)
+ *  'hairline'   - just a ticked hairline
+ *  'none'       - nothing rendered
+ */
+function dividerKind(p: string | undefined, c: string | undefined): 'slope-up' | 'slope-down' | 'curve' | 'torn' | 'hairline' | 'none' {
+  if (!p || !c || p === c) return 'hairline';
+  /* High-luminance contrast = editorial torn. */
+  if ((p === 'paper' && c === 'obsidian') || (p === 'obsidian' && c === 'paper')) return 'torn';
+  if (p === 'paper' && c === 'moss') return 'slope-down';
+  if (p === 'moss' && c === 'paper') return 'slope-up';
+  if (p === 'leak' || c === 'leak') return 'curve';
+  /* Default soft curve. */
+  return 'curve';
+}
+
+const kind = dividerKind(prev, cur);
+
+/* Editorial / Heritage vibes prefer hard edges; downgrade to hairline. */
+const sharpEdges = vibe === 'The Editorial' || vibe === 'The Heritage';
+const finalKind = sharpEdges && kind !== 'hairline' ? 'hairline' : kind;
 ---
 
-{!sharpEdges && prevTone && (
-  <div
-    aria-hidden="true"
-    class="block w-full overflow-hidden"
-    style={`height: 48px; line-height: 0; background: transparent;`}
-  >
-    <svg
-      viewBox="0 0 1440 48"
-      preserveAspectRatio="none"
-      class="block h-full w-full"
-      style={`color: ${previousFill};`}
-    >
-      {useDiagonal ? (
-        <path d="M0,0 L1440,0 L1440,30 L0,48 Z" fill="currentColor" />
-      ) : (
-        <path d="M0,0 L1440,0 L1440,12 C1080,48 360,0 0,36 Z" fill="currentColor" />
-      )}
+{finalKind === 'hairline' && prevTone && (
+  <div aria-hidden="true" class="nm-divider nm-divider--hairline">
+    <hr class="nm-rule nm-rule--ticked" />
+  </div>
+)}
+
+{finalKind === 'slope-up' && (
+  <div aria-hidden="true" class="nm-divider" style={`color: ${previousFill};`}>
+    <svg viewBox="0 0 1440 64" preserveAspectRatio="none" class="block h-full w-full">
+      {/* Previous tone fills bottom-left, slopes up to top-right. */}
+      <path d="M0,64 L0,32 C540,8 900,56 1440,16 L1440,64 Z" fill="currentColor" />
     </svg>
   </div>
 )}
+
+{finalKind === 'slope-down' && (
+  <div aria-hidden="true" class="nm-divider" style={`color: ${previousFill};`}>
+    <svg viewBox="0 0 1440 64" preserveAspectRatio="none" class="block h-full w-full">
+      {/* Previous tone fills bottom-right, slopes up to top-left. */}
+      <path d="M0,64 L0,16 C540,56 900,8 1440,32 L1440,64 Z" fill="currentColor" />
+    </svg>
+  </div>
+)}
+
+{finalKind === 'curve' && (
+  <div aria-hidden="true" class="nm-divider" style={`color: ${previousFill};`}>
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" class="block h-full w-full">
+      {/* Long S-curve from bottom-left to top-right. */}
+      <path d="M0,80 L0,40 C320,80 720,8 1080,40 C1260,56 1380,32 1440,28 L1440,80 Z" fill="currentColor" />
+    </svg>
+  </div>
+)}
+
+{finalKind === 'torn' && (
+  <div aria-hidden="true" class="nm-divider" style={`color: ${previousFill};`}>
+    <svg viewBox="0 0 1440 56" preserveAspectRatio="none" class="block h-full w-full">
+      {/*
+       * Editorial torn-paper edge - multi-point path that reads as a
+       * sheet of paper ripped along an irregular line.
+       */}
+      <path
+        d="M0,56 L0,32 L60,28 L120,36 L200,22 L260,30 L340,18 L420,28 L500,16 L580,26 L660,14 L740,28 L820,20 L900,30 L980,18 L1060,30 L1140,22 L1220,32 L1300,20 L1380,28 L1440,18 L1440,56 Z"
+        fill="currentColor"
+      />
+    </svg>
+  </div>
+)}
+
+<style is:inline>
+  .nm-divider {
+    display: block;
+    width: 100%;
+    line-height: 0;
+    pointer-events: none;
+    background: transparent;
+  }
+  .nm-divider > svg {
+    height: clamp(40px, 5vh, 64px);
+    width: 100%;
+  }
+  .nm-divider--hairline {
+    padding: 0 clamp(1.5rem, 3vw, 3rem);
+  }
+  .nm-divider--hairline hr {
+    margin: 0 auto;
+    max-width: 88rem;
+  }
+</style>

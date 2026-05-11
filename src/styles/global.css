@@ -60,12 +60,34 @@
     font-family: var(--fp-font-display);
     color: var(--fp-ink);
   }
+
+  /*
+   * Global prose overflow guard. Long unbroken strings (URLs, IDs, test
+   * fixtures like `prop.laj;sdlfkja;...`) used to bust the column. Anchor
+   * every text-bearing element to break wherever necessary so no demo
+   * lead can produce a horizontal scrollbar.
+   */
+  p, li, dd, dt, blockquote, h1, h2, h3, h4, h5, h6, figcaption {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+  }
 }
 
 @layer components {
   .fp-section {
     @apply mx-auto w-full px-6 py-20;
-    max-width: 80rem;
+    max-width: 88rem;
+  }
+
+  /*
+   * Inner-content container, opted into by sections that explicitly want
+   * a centered narrow column (Pricing comparison table, FAQ list, etc.).
+   * Asymmetric / full-bleed sections do NOT use this - they own the
+   * 88rem outer width and lay out off-axis grids inside.
+   */
+  .fp-prose {
+    max-width: 56rem;
   }
 
   .fp-card {

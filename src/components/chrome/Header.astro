@@ -1,76 +1,379 @@
 ---
 import { siteDna } from '../../lib/siteDna';
 import { businessInitials } from '../../lib/defaults';
+import { resolveShellMeta } from '../../lib/layoutShell';
 import Icon from '../Icon.astro';
+
+/*
+ * NM Header - asymmetric blueprint chrome.
+ *
+ * The old centered nav + right-aligned CTA pattern was a Bootstrap cliche
+ * and the user explicitly named it as a thing to kill. This header is a
+ * single composition (not per-shell) because consistency at the chrome
+ * level is part of the NM signature; the active shell flexes density and
+ * exposed rules but does not swap the layout.
+ *
+ * Composition:
+ *   row 1 (rule line):   blueprint label top-left, hairline+ticks across,
+ *                        section count top-right
+ *   row 2 (working line): monogram + wordmark + workshop tag (left)
+ *                         | nav chips (center, drift-offset Y per chip)
+ *                         | CTA pill (right)
+ *   bottom rule:          ticked hairline
+ *
+ * The blueprint label cycles through ("LB" -> "WORKSHOP" -> "STUDIO MARK")
+ * based on the shell number so the same field carries an editorial code
+ * instead of static "LOGIC BROOKS".
+ *
+ * Mobile (<= 640px) collapses to: monogram | MENU/N°XX pill | CTA pill.
+ */
 
 const { businessInfo, assets } = siteDna;
 const name = businessInfo.name ?? 'Your Business';
 const initials = businessInitials(businessInfo);
 const logo = assets.logo;
+const meta = resolveShellMeta(siteDna);
+
+const NAV_ITEMS = [
+  { href: '#services',     code: '01', label: 'Practice' },
+  { href: '#pricing',      code: '02', label: 'Ledger' },
+  { href: '#testimonials', code: '03', label: 'Voices' },
+  { href: '#faq',          code: '04', label: 'Reference' },
+  { href: '#contact',      code: '05', label: 'Visit' },
+] as const;
+
+/* Density throttle - busy shows all 5, standard 4, quiet 3. */
+const navCount = meta.density === 'busy' ? 5 : meta.density === 'quiet' ? 3 : 4;
+const navItems = NAV_ITEMS.slice(0, navCount);
+
+const showRules = meta.exposedRules;
 ---
 
 <header
-  class="fp-header sticky top-0 z-40 w-full"
-  style="background: color-mix(in oklab, var(--fp-bg) 88%, transparent); backdrop-filter: saturate(140%) blur(12px); border-bottom: 1px solid var(--fp-border-on-bg);"
+  class="nm-header sticky top-0 z-40 w-full"
+  data-shell={meta.id}
 >
-  <div class="mx-auto flex w-full max-w-[80rem] items-center justify-between gap-4 px-6 py-3">
-    <a href="#top" class="flex items-center gap-3" aria-label={`${name} home`}>
+  {showRules && (
+    <div class="nm-header__rule" aria-hidden="true">
+      <span class="nm-header__rule-label">LB / {meta.number}</span>
+      <span class="nm-header__rule-line"></span>
+      <span class="nm-header__rule-sheet">SHEET·01·OF·{String(navItems.length).padStart(2, '0')}</span>
+    </div>
+  )}
+
+  <div class="nm-header__bar">
+    <a href="#top" class="nm-header__mark" aria-label={`${name} home`}>
       {logo ? (
-        <img
-          src={logo.downloadURL}
-          alt={`${name} logo`}
-          class="h-9 w-auto"
-          width={logo.width}
-          height={logo.height}
-        />
+        <img src={logo.downloadURL} alt={`${name} logo`} class="nm-header__logo-img" width={logo.width} height={logo.height} />
       ) : (
-        <span
-          class="flex h-9 w-9 items-center justify-center font-display text-sm font-bold"
-          style="background: color-mix(in oklab, var(--fp-on-bg) 18%, transparent); color: var(--fp-on-bg); border-radius: var(--fp-radius);"
-        >
-          {initials}
-        </span>
+        <span class="nm-header__monogram">{initials}</span>
       )}
-      <span class="font-display text-base font-semibold md:text-lg" style="color: var(--fp-on-bg)">
-        {name}
+      <span class="nm-header__wordmark-stack">
+        <span class="nm-header__wordmark">{name}</span>
+        {showRules && (
+          <span class="nm-header__workshop">{meta.number} / WORKSHOP</span>
+        )}
       </span>
     </a>
 
-    <nav class="hidden items-center gap-7 md:flex" aria-label="Primary">
-      <a href="#services" class="text-sm font-medium hover:underline" style="color: var(--fp-on-bg)">Services</a>
-      <a href="#pricing" class="text-sm font-medium hover:underline" style="color: var(--fp-on-bg)">Pricing</a>
-      <a href="#testimonials" class="text-sm font-medium hover:underline" style="color: var(--fp-on-bg)">Reviews</a>
-      <a href="#faq" class="text-sm font-medium hover:underline" style="color: var(--fp-on-bg)">FAQ</a>
-      <a href="#contact" class="text-sm font-medium hover:underline" style="color: var(--fp-on-bg)">Contact</a>
+    <nav class="nm-header__nav" aria-label="Primary">
+      {navItems.map((item, i) => (
+        <a
+          href={item.href}
+          class="nm-chip"
+          style={`transform: translateY(${(-1 + ((i * 7) % 4))}px)`}
+        >
+          <span class="nm-chip__num">{item.code}</span>
+          <span class="nm-chip__sep">/</span>
+          <span class="nm-chip__label">{item.label}</span>
+        </a>
+      ))}
     </nav>
 
-    <a href="#contact" class="fp-button hidden text-sm sm:inline-flex">
-      Get a quote
+    <a href="#contact" class="nm-header__cta">
+      <span>Get a quote</span>
+      <Icon name="arrow" size={14} class="ml-2" />
     </a>
 
     <button
       type="button"
-      class="inline-flex h-10 w-10 items-center justify-center md:hidden"
-      style="color: var(--fp-on-bg);"
+      class="nm-header__menu-btn"
       aria-label="Open menu"
       onclick="document.getElementById('fp-mobile-nav')?.toggleAttribute('hidden')"
     >
-      <Icon name="menu" size={22} />
+      <span class="nm-header__menu-pill">MENU / {meta.number}</span>
+      <Icon name="menu" size={18} />
     </button>
   </div>
+
+  <hr class="nm-rule nm-rule--ticked nm-header__bottom-rule" />
 
   <div
     id="fp-mobile-nav"
     hidden
-    class="md:hidden"
-    style="background: var(--fp-bg); border-top: 1px solid var(--fp-border-on-bg);"
+    class="nm-header__mobile-panel"
   >
-    <nav class="mx-auto flex w-full max-w-[80rem] flex-col px-6 py-3" aria-label="Mobile">
-      <a href="#services" class="py-2 text-sm font-medium" style="color: var(--fp-on-bg)">Services</a>
-      <a href="#pricing" class="py-2 text-sm font-medium" style="color: var(--fp-on-bg)">Pricing</a>
-      <a href="#testimonials" class="py-2 text-sm font-medium" style="color: var(--fp-on-bg)">Reviews</a>
-      <a href="#faq" class="py-2 text-sm font-medium" style="color: var(--fp-on-bg)">FAQ</a>
-      <a href="#contact" class="py-2 text-sm font-medium" style="color: var(--fp-on-bg)">Contact</a>
-    </nav>
+    {navItems.map((item) => (
+      <a href={item.href} class="nm-header__mobile-link">
+        <span class="nm-header__mobile-code">{item.code}</span>
+        <span>{item.label}</span>
+      </a>
+    ))}
+    <a href="#contact" class="nm-header__mobile-cta">Get a quote</a>
   </div>
 </header>
+
+<style is:inline>
+  /*
+   * NM header - all styles inline so the chrome is portable across vibes
+   * and doesn't fight Tailwind defaults.
+   */
+  .nm-header {
+    background: color-mix(in oklab, var(--fp-bg) 92%, transparent);
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    color: var(--fp-ink);
+  }
+
+  /* Top rule line (blueprint marker + hairline + sheet stamp). */
+  .nm-header__rule {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 24px 0;
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--fp-ink) 55%, transparent);
+  }
+  @media (min-width: 768px) {
+    .nm-header__rule { display: flex; }
+  }
+  .nm-header__rule-line {
+    flex: 1;
+    height: 1px;
+    background: color-mix(in oklab, var(--fp-ink) 28%, transparent);
+    position: relative;
+  }
+  .nm-header__rule-line::before,
+  .nm-header__rule-line::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    width: 1px;
+    height: 7px;
+    background: color-mix(in oklab, var(--fp-ink) 38%, transparent);
+  }
+  .nm-header__rule-line::before { left: 0; }
+  .nm-header__rule-line::after { right: 0; }
+
+  /* Working bar. */
+  .nm-header__bar {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 18px;
+    padding: 12px 24px;
+    max-width: 88rem;
+    margin: 0 auto;
+  }
+  @media (max-width: 767px) {
+    .nm-header__bar {
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      padding: 10px 16px;
+    }
+  }
+
+  /* Mark cluster (monogram + wordmark + workshop tag). */
+  .nm-header__mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .nm-header__monogram {
+    display: inline-flex;
+    height: 38px;
+    width: 38px;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in oklab, var(--nm-accent, var(--fp-accent)) 22%, transparent);
+    color: var(--nm-accent, var(--fp-accent));
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .nm-header__logo-img {
+    display: block;
+    height: 36px;
+    width: auto;
+    flex-shrink: 0;
+  }
+  .nm-header__wordmark-stack {
+    display: inline-flex;
+    flex-direction: column;
+    line-height: 1.05;
+    min-width: 0;
+  }
+  .nm-header__wordmark {
+    font-family: var(--nm-font-display, var(--fp-font-display));
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    color: var(--fp-ink);
+  }
+  @media (min-width: 1024px) {
+    .nm-header__wordmark { font-size: 19px; }
+  }
+  .nm-header__workshop {
+    margin-top: 2px;
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--fp-ink) 50%, transparent);
+  }
+
+  /* Nav chips. */
+  .nm-header__nav {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  @media (min-width: 1024px) {
+    .nm-header__nav { display: inline-flex; }
+  }
+
+  .nm-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--fp-ink) 18%, transparent);
+    background: color-mix(in oklab, var(--fp-ink) 3%, transparent);
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--fp-ink);
+    transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), border-color 200ms, background 200ms;
+    white-space: nowrap;
+  }
+  .nm-chip:hover {
+    border-color: var(--nm-accent, var(--fp-accent));
+    background: color-mix(in oklab, var(--nm-accent, var(--fp-accent)) 10%, transparent);
+  }
+  .nm-chip__num {
+    color: var(--nm-accent, var(--fp-accent));
+    font-weight: 600;
+  }
+  .nm-chip__sep {
+    color: color-mix(in oklab, var(--fp-ink) 40%, transparent);
+  }
+
+  /* CTA. */
+  .nm-header__cta {
+    display: none;
+    align-items: center;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: var(--nm-accent, var(--fp-accent));
+    color: var(--nm-on-accent, var(--fp-on-accent));
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: transform 200ms, box-shadow 200ms;
+  }
+  .nm-header__cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px -8px color-mix(in oklab, var(--nm-accent, var(--fp-accent)) 60%, transparent);
+  }
+  @media (min-width: 640px) {
+    .nm-header__cta { display: inline-flex; }
+  }
+
+  /* Mobile menu button. */
+  .nm-header__menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px 6px 14px;
+    border: 1px solid color-mix(in oklab, var(--fp-ink) 18%, transparent);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--fp-ink);
+    cursor: pointer;
+  }
+  @media (min-width: 1024px) {
+    .nm-header__menu-btn { display: none; }
+  }
+  .nm-header__menu-pill {
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--fp-ink) 65%, transparent);
+  }
+
+  /* Bottom rule on every header. */
+  .nm-header__bottom-rule {
+    margin: 0;
+  }
+
+  /* Mobile panel. */
+  .nm-header__mobile-panel {
+    border-top: 1px solid color-mix(in oklab, var(--fp-ink) 12%, transparent);
+    background: var(--fp-bg);
+    padding: 8px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  @media (min-width: 1024px) {
+    .nm-header__mobile-panel { display: none; }
+  }
+  .nm-header__mobile-link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 10px 4px;
+    text-decoration: none;
+    color: var(--fp-ink);
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-bottom: 1px solid color-mix(in oklab, var(--fp-ink) 8%, transparent);
+  }
+  .nm-header__mobile-code {
+    color: var(--nm-accent, var(--fp-accent));
+    font-weight: 600;
+  }
+  .nm-header__mobile-cta {
+    margin-top: 8px;
+    align-self: flex-start;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: var(--nm-accent, var(--fp-accent));
+    color: var(--nm-on-accent, var(--fp-on-accent));
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+</style>

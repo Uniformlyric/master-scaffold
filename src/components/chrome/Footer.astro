@@ -5,109 +5,292 @@ import {
   realOrDefaultServices,
   businessInitials,
 } from '../../lib/defaults';
-import Icon from '../Icon.astro';
+import { resolveShellMeta } from '../../lib/layoutShell';
+import MonogramFigure from '../MonogramFigure.astro';
+
+/*
+ * NM Footer - "studio mark" composition.
+ *
+ * Old footer: 4 evenly-weighted columns + colophon strip. Reads as a
+ * commodity site map.
+ *
+ * New footer: giant wordmark left + mono nav columns right + peeling
+ * masked photo top-right that peels INTO the CTA section above.
+ *
+ * The footer carries an obsidian/moss tone via .nm-tone-obsidian so it
+ * ALWAYS anchors the page regardless of vibe luminance. The leak ride
+ * along the bottom-right gives the wordmark some depth.
+ */
 
 const { businessInfo, assets } = siteDna;
 const name = businessInfo.name ?? 'Your Business';
 const initials = businessInitials(businessInfo);
 const contact = defaultContactInfo(businessInfo);
 const services = realOrDefaultServices(businessInfo).slice(0, 5);
-const logo = assets.logo;
+const heroAsset = assets.hero;
+const galleryAsset = assets.gallery?.[0];
+const yearStart = (businessInfo as { yearFounded?: number; foundedYear?: number }).yearFounded
+  ?? (businessInfo as { yearFounded?: number; foundedYear?: number }).foundedYear;
 const year = new Date().getFullYear();
+const est = yearStart && yearStart > 1700 && yearStart <= year ? yearStart : year - 8;
+const meta = resolveShellMeta(siteDna);
+
+const NAV_SECTIONS = [
+  { href: '#services',     code: '01', label: 'Practice' },
+  { href: '#pricing',      code: '02', label: 'Ledger' },
+  { href: '#testimonials', code: '03', label: 'Voices' },
+  { href: '#faq',          code: '04', label: 'Reference' },
+  { href: '#contact',      code: '05', label: 'Visit' },
+];
+
+const peelMedia = heroAsset ?? galleryAsset;
 ---
 
-<footer
-  class="fp-footer fp-tone-bg"
-  style="border-top: 1px solid var(--fp-border-on-bg);"
->
-  <div class="mx-auto grid w-full max-w-[80rem] gap-10 px-6 py-16 md:grid-cols-12">
-    <div class="md:col-span-4">
-      <a href="#top" class="flex items-center gap-3" aria-label={`${name} home`}>
-        {logo ? (
-          <img
-            src={logo.downloadURL}
-            alt={`${name} logo`}
-            class="h-9 w-auto"
-            width={logo.width}
-            height={logo.height}
-          />
-        ) : (
-          <span
-            class="flex h-9 w-9 items-center justify-center font-display text-sm font-bold"
-            style="background: color-mix(in oklab, var(--fp-on-bg) 18%, transparent); color: var(--fp-on-bg); border-radius: var(--fp-radius);"
-          >
-            {initials}
-          </span>
-        )}
-        <span class="font-display text-lg font-semibold" style="color: var(--fp-on-bg)">
-          {name}
-        </span>
-      </a>
-      <p class="mt-4 text-sm leading-relaxed" style="color: var(--fp-on-bg-muted)">
-        {businessInfo.valueProp ?? `${name} is a trusted local team delivering reliable, high-quality service backed by hundreds of five-star reviews.`}
+<footer class="nm-footer nm-tone-obsidian" data-shell={meta.id} data-tone="obsidian">
+  {/*
+   * Peeling masked thumbnail that breaks UP into the previous section.
+   * Positioned top-right with translateY(-30%) so its top half lives in
+   * the band above the footer (CTA or Contact).
+   */}
+  {peelMedia && (
+    <figure class="nm-footer__peel nm-mask-lozenge" data-drift="slow">
+      <img
+        src={peelMedia.downloadURL}
+        alt=""
+        class="nm-cinematic"
+        loading="lazy"
+        width={peelMedia.width}
+        height={peelMedia.height}
+      />
+    </figure>
+  )}
+
+  <span class="nm-leak nm-leak--3 nm-leak--br" aria-hidden="true"></span>
+
+  <span class="nm-label nm-label--corner-tl">N°00 / STUDIO MARK</span>
+
+  <div class="nm-footer__grid">
+    <div class="nm-footer__mark">
+      <span class="nm-footer__est">EST·{est} / N°{meta.number.replace('N°', '')}</span>
+      <h2 class="nm-footer__wordmark">{name}.</h2>
+      <p class="nm-footer__tag">
+        {businessInfo.valueProp ?? `${name} is a trusted team delivering reliable, considered work for clients across the region.`}
       </p>
+      {!peelMedia && (
+        <div class="nm-footer__monogram-fallback nm-mask-lozenge" aria-hidden="true">
+          <MonogramFigure initials={initials} />
+        </div>
+      )}
     </div>
 
-    <div class="md:col-span-3">
-      <h4 class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--fp-on-bg)">
-        Services
-      </h4>
-      <ul class="mt-4 space-y-2 text-sm">
-        {services.map((s) => (
-          <li>
-            <a href="#services" class="hover:underline" style="color: var(--fp-on-bg-muted)">
-              {s.title}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <div class="nm-footer__columns">
+      <div class="nm-footer__col">
+        <h4 class="nm-footer__heading">Sections</h4>
+        <ul class="nm-footer__list">
+          {NAV_SECTIONS.map((s) => (
+            <li>
+              <a href={s.href} class="nm-footer__link">
+                <span class="nm-footer__code">{s.code}</span>
+                <span>{s.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-    <div class="md:col-span-3">
-      <h4 class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--fp-on-bg)">
-        Contact
-      </h4>
-      <ul class="mt-4 space-y-3 text-sm" style="color: var(--fp-on-bg-muted)">
-        <li class="flex items-center gap-2">
-          <Icon name="phone" size={14} />
-          <a href={contact.phoneHref} class="hover:underline">{contact.phone}</a>
-        </li>
-        <li class="flex items-center gap-2">
-          <Icon name="mail" size={14} />
-          <a href={contact.emailHref} class="hover:underline">{contact.email}</a>
-        </li>
-        <li class="flex items-start gap-2">
-          <Icon name="clock" size={14} class="mt-0.5" />
-          <span>{contact.hours}</span>
-        </li>
-        <li class="flex items-start gap-2">
-          <Icon name="pin" size={14} class="mt-0.5" />
-          <span>{contact.address}</span>
-        </li>
-      </ul>
-    </div>
+      <div class="nm-footer__col">
+        <h4 class="nm-footer__heading">Practice</h4>
+        <ul class="nm-footer__list">
+          {services.map((s, i) => (
+            <li>
+              <a href="#services" class="nm-footer__link">
+                <span class="nm-footer__code">{String(i + 1).padStart(2, '0')}</span>
+                <span>{s.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-    <div class="md:col-span-2">
-      <h4 class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--fp-on-bg)">
-        Follow
-      </h4>
-      <ul class="mt-4 space-y-2 text-sm">
-        {contact.socials.map((s) => (
-          <li>
-            <a href={s.href} class="hover:underline" style="color: var(--fp-on-bg-muted)">
-              {s.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <div class="nm-footer__col">
+        <h4 class="nm-footer__heading">Correspondence</h4>
+        <ul class="nm-footer__list">
+          <li><a href={contact.phoneHref} class="nm-footer__link"><span class="nm-footer__code">TEL</span><span>{contact.phone}</span></a></li>
+          <li><a href={contact.emailHref} class="nm-footer__link"><span class="nm-footer__code">EML</span><span>{contact.email}</span></a></li>
+          <li class="nm-footer__static"><span class="nm-footer__code">HRS</span><span>{contact.hours}</span></li>
+          <li class="nm-footer__static"><span class="nm-footer__code">LOC</span><span>{contact.address}</span></li>
+        </ul>
+      </div>
     </div>
   </div>
 
-  <div
-    class="mx-auto flex w-full max-w-[80rem] flex-col items-center justify-between gap-3 px-6 py-6 text-xs sm:flex-row"
-    style="color: var(--fp-on-bg-muted); border-top: 1px solid var(--fp-border-on-bg);"
-  >
-    <p>&copy; {year} {name}. All rights reserved.</p>
-    <p class="opacity-80">Built with Flashpoint</p>
+  <hr class="nm-rule nm-rule--ticked nm-footer__rule" />
+
+  <div class="nm-footer__colophon">
+    <span>&copy; {year} &middot; {name} &middot; N°{meta.number.replace('N°', '')}</span>
+    <span class="nm-footer__end-stamp">END·OF·SHEET</span>
   </div>
 </footer>
+
+<style is:inline>
+  .nm-footer {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(4rem, 9vh, 7rem) clamp(1.5rem, 4vw, 3rem) 1.5rem;
+    isolation: isolate;
+  }
+
+  /* Peel - lives top-right, translates UP so it breaks the section above. */
+  .nm-footer__peel {
+    position: absolute;
+    top: 0;
+    right: 6vw;
+    width: clamp(110px, 14vw, 180px);
+    aspect-ratio: 4 / 5;
+    transform: translateY(-30%) rotate(2deg);
+    overflow: hidden;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .nm-footer__peel img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .nm-footer__grid {
+    max-width: 88rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+    position: relative;
+    z-index: 2;
+  }
+  @media (min-width: 1024px) {
+    .nm-footer__grid {
+      grid-template-columns: 1.15fr 1fr;
+      gap: 5rem;
+    }
+  }
+
+  .nm-footer__mark {
+    min-width: 0;
+  }
+  .nm-footer__est {
+    display: inline-block;
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--fp-ink) 55%, transparent);
+  }
+  .nm-footer__wordmark {
+    margin-top: 0.5rem;
+    font-family: var(--nm-font-display, var(--fp-font-display));
+    font-size: clamp(3rem, 9vw, 6.5rem);
+    font-weight: 600;
+    line-height: 0.92;
+    letter-spacing: -0.025em;
+    color: var(--fp-ink);
+  }
+  .nm-footer__tag {
+    margin-top: 1.5rem;
+    max-width: 32rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: color-mix(in oklab, var(--fp-ink) 75%, transparent);
+  }
+
+  .nm-footer__monogram-fallback {
+    margin-top: 2rem;
+    width: 120px;
+    aspect-ratio: 1;
+  }
+
+  /* Right-side columns. */
+  .nm-footer__columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+  }
+  @media (min-width: 768px) {
+    .nm-footer__columns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .nm-footer__heading {
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--fp-ink) 60%, transparent);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--fp-ink) 16%, transparent);
+  }
+  .nm-footer__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .nm-footer__link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--fp-ink);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    transition: color 200ms;
+  }
+  .nm-footer__link:hover {
+    color: var(--nm-accent, var(--fp-accent));
+  }
+  .nm-footer__static {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    color: color-mix(in oklab, var(--fp-ink) 70%, transparent);
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  .nm-footer__code {
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--nm-accent, var(--fp-accent));
+    font-weight: 600;
+    min-width: 28px;
+    flex-shrink: 0;
+  }
+
+  .nm-footer__rule {
+    margin: 3rem auto 0;
+    max-width: 88rem;
+    opacity: 0.6;
+  }
+  .nm-footer__colophon {
+    max-width: 88rem;
+    margin: 1rem auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-family: var(--nm-font-mono, ui-monospace, monospace);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--fp-ink) 55%, transparent);
+  }
+  @media (min-width: 640px) {
+    .nm-footer__colophon {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+  .nm-footer__end-stamp {
+    color: var(--nm-accent, var(--fp-accent));
+  }
+</style>

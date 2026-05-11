@@ -1,70 +1,182 @@
 ---
 import { siteDna } from '../../lib/siteDna';
 import { realOrDefaultServices } from '../../lib/defaults';
+import { resolveShellMeta } from '../../lib/layoutShell';
 import Icon from '../Icon.astro';
 
 const services = realOrDefaultServices(siteDna.businessInfo);
+const meta = resolveShellMeta(siteDna);
+
+/**
+ * Services variant resolution.
+ *
+ *  peel-cards     - cards lift on hover, fp-card chrome (default)
+ *  tabular        - editorial table layout, hairline rules between rows
+ *  tile-grid      - dense product-tile grid, no descriptions visible by default
+ *  editorial-list - numbered list with hairlines, restraint-first
+ */
+function servicesVariantFor(shellId: string): 'peel-cards' | 'tabular' | 'tile-grid' | 'editorial-list' {
+  switch (shellId) {
+    case 'cabinet':
+    case 'vitrine':
+    case 'workshop':
+      return 'tile-grid';
+    case 'ledger':
+    case 'portico':
+      return 'tabular';
+    case 'letterhead':
+      return 'editorial-list';
+    default:
+      return 'peel-cards';
+  }
+}
+
+const variant = servicesVariantFor(meta.id);
 ---
 
-<section id="services" class="fp-section" data-reveal>
-  <div class="mx-auto max-w-2xl text-center">
-    <p class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--fp-accent)">
-      What we do
-    </p>
+<section
+  id="services"
+  class="fp-section nm-leak-field"
+  data-reveal
+  data-shell-services={variant}
+>
+  {meta.density === 'busy' && (
+    <span class="nm-leak nm-leak--2 nm-leak--tr" aria-hidden="true"></span>
+  )}
+
+  <div class="grid items-end gap-8 md:grid-cols-12">
     <h2
-      class="mt-3 font-display text-3xl font-semibold md:text-4xl lg:text-5xl"
-      style="color: var(--fp-ink)"
+      class="md:col-span-8 font-display font-semibold"
+      style="font-family: var(--nm-font-display, var(--fp-font-display)); color: var(--fp-ink); font-size: clamp(2.75rem, 7vw, 5.5rem); letter-spacing: -0.02em; line-height: 0.95;"
     >
-      Services that move the needle
+      Services that <span style="font-family: var(--nm-font-italic, Georgia, serif); font-style: italic; font-weight: 400;">move</span> the needle.
     </h2>
-    <p class="mt-4 text-base md:text-lg" style="color: var(--fp-muted)">
+    <p class="md:col-span-4 max-w-prose text-base md:text-lg" style="color: var(--fp-muted)">
       Pick the package that fits. Every job ships with the same craftsmanship and a written satisfaction guarantee.
     </p>
   </div>
 
-  <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-    {services.slice(0, 6).map((service, idx) => (
-      <article
-        class="fp-card group flex h-full flex-col transition-transform duration-200 hover:-translate-y-1"
-        style="border-left-width: 4px; border-left-style: solid; border-left-color: var(--fp-accent);"
-      >
-        <div class="flex items-center gap-3">
-          <span
-            class="inline-flex h-9 w-9 items-center justify-center font-display text-sm font-bold"
-            style="background: color-mix(in oklab, var(--fp-accent) 18%, transparent); color: var(--fp-accent); border-radius: var(--fp-radius);"
-          >
-            {String(idx + 1).padStart(2, '0')}
-          </span>
-          <h3
-            class="font-display text-xl font-semibold"
-            style="color: var(--fp-ink)"
-          >
-            {service.title}
-          </h3>
-        </div>
-
-        {service.description && (
-          <p class="mt-4 flex-1 text-sm leading-relaxed md:text-base" style="color: var(--fp-muted)">
-            {service.description}
-          </p>
-        )}
-
-        <div class="mt-6 flex items-center justify-between gap-4">
-          {service.priceLabel && (
-            <p class="text-sm font-semibold" style="color: var(--fp-accent)">
-              {service.priceLabel}
+  {variant === 'peel-cards' && (
+    <div class="mt-16 grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-x-6 md:gap-y-10">
+      {services.slice(0, 6).map((service, idx) => {
+        /*
+         * Staggered 12-col grid - cards land on cols 1-4, 5-8, 9-12 but
+         * each gets a different translateY so the bottom edges form a
+         * jagged ridge instead of a flat row. Card index 1 sits lower
+         * (the "peel" card), index 2 sits slightly lower.
+         */
+        const colSpans = ['md:col-span-4', 'md:col-span-4', 'md:col-span-4', 'md:col-span-4', 'md:col-span-4', 'md:col-span-4'];
+        const yOffsets = ['md:translate-y-0', 'md:translate-y-[6vh]', 'md:translate-y-[2vh]', 'md:translate-y-[8vh]', 'md:translate-y-[1vh]', 'md:translate-y-[5vh]'];
+        return (
+        <article
+          class:list={[
+            'fp-card group flex h-full flex-col transition-transform duration-300 hover:-translate-y-2',
+            colSpans[idx % colSpans.length],
+            yOffsets[idx % yOffsets.length],
+            meta.peelStrength >= 1 && idx % 3 === 1 && 'nm-peel-1',
+            meta.peelStrength >= 2 && idx % 3 === 2 && 'nm-peel-2',
+          ]}
+          style="border-radius: var(--nm-radius-md, var(--fp-radius)); border-left-width: 3px; border-left-style: solid; border-left-color: var(--nm-accent, var(--fp-accent));"
+        >
+          <div class="flex items-center gap-3">
+            <span
+              class="inline-flex h-9 w-9 items-center justify-center font-mono text-sm font-bold"
+              style="background: color-mix(in oklab, var(--nm-accent, var(--fp-accent)) 18%, transparent); color: var(--nm-accent, var(--fp-accent)); border-radius: var(--nm-radius-sm, var(--fp-radius));"
+            >
+              {String(idx + 1).padStart(2, '0')}
+            </span>
+            <h3 class="font-display text-xl font-semibold" style="color: var(--fp-ink)">{service.title}</h3>
+          </div>
+          {service.description && (
+            <p class="mt-4 flex-1 text-sm leading-relaxed md:text-base" style="color: var(--fp-muted)">
+              {service.description}
             </p>
           )}
-          <a
-            href="#contact"
-            class="inline-flex items-center gap-1 text-sm font-semibold transition-colors group-hover:opacity-80"
-            style="color: var(--fp-ink)"
-          >
-            Learn more
-            <Icon name="arrow" size={14} />
-          </a>
-        </div>
-      </article>
-    ))}
-  </div>
+          <div class="mt-6 flex items-center justify-between gap-4">
+            {service.priceLabel && (
+              <p class="font-mono text-sm font-semibold" style="color: var(--nm-accent, var(--fp-accent))">{service.priceLabel}</p>
+            )}
+            <a href="#contact" class="inline-flex items-center gap-1 text-sm font-semibold" style="color: var(--fp-ink)">
+              Learn more <Icon name="arrow" size={14} />
+            </a>
+          </div>
+        </article>
+        );
+      })}
+    </div>
+  )}
+
+  {variant === 'tabular' && (
+    <div class="mx-auto mt-12 max-w-4xl">
+      <ul class="border-t" style="border-color: var(--fp-border-color)">
+        {services.slice(0, 6).map((service, idx) => (
+          <li class="grid grid-cols-12 items-baseline gap-6 border-b py-6" style="border-color: var(--fp-border-color)">
+            <span class="col-span-1 font-mono text-xs" style="color: var(--fp-muted)">{String(idx + 1).padStart(2, '0')}</span>
+            <h3 class="col-span-5 font-display text-2xl font-semibold tracking-tight" style="font-family: var(--nm-font-display, var(--fp-font-display)); color: var(--fp-ink)">{service.title}</h3>
+            {service.description && (
+              <p class="col-span-4 text-sm leading-relaxed" style="color: var(--fp-muted)">{service.description}</p>
+            )}
+            <div class="col-span-2 text-right">
+              {service.priceLabel && (
+                <p class="font-mono text-sm font-semibold" style="color: var(--nm-accent, var(--fp-accent))">{service.priceLabel}</p>
+              )}
+              <a href="#contact" class="mt-1 inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest" style="color: var(--fp-ink)">
+                Inquire <Icon name="arrow" size={12} />
+              </a>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  {variant === 'tile-grid' && (
+    <div class="mt-12 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
+      {services.slice(0, 8).map((service, idx) => (
+        <a
+          href="#contact"
+          class:list={[
+            'group relative flex aspect-square flex-col justify-between overflow-hidden p-4 transition-transform duration-200 hover:-translate-y-1',
+            idx % 4 === 1 && 'md:translate-y-3',
+            idx % 4 === 3 && 'md:-translate-y-2',
+          ]}
+          style="background: color-mix(in oklab, var(--fp-ink) 6%, transparent); border: 1px solid var(--fp-border-color); border-radius: var(--nm-radius-sm, var(--fp-radius));"
+        >
+          <span class="font-mono text-[10px] uppercase tracking-widest" style="color: var(--nm-accent, var(--fp-accent))">N°{String(idx + 1).padStart(2, '0')}</span>
+          <div>
+            <h3 class="font-display text-base font-semibold leading-tight md:text-lg" style="color: var(--fp-ink)">{service.title}</h3>
+            {service.priceLabel && (
+              <p class="mt-1 font-mono text-xs" style="color: var(--fp-muted)">{service.priceLabel}</p>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  )}
+
+  {variant === 'editorial-list' && (
+    <div class="mx-auto mt-12 max-w-2xl">
+      <ol class="space-y-0">
+        {services.slice(0, 6).map((service, idx) => (
+          <li class="border-b py-6 last:border-b-0" style="border-color: var(--fp-border-color)">
+            <div class="flex items-baseline gap-4">
+              <span class="font-mono text-[11px] uppercase tracking-widest" style="color: var(--fp-muted)">N°{String(idx + 1).padStart(2, '0')}</span>
+              <h3 class="flex-1" style="font-family: var(--nm-font-italic, Georgia, serif); font-style: italic; font-weight: 500; font-size: clamp(1.5rem, 3vw, 2.25rem); color: var(--fp-ink); line-height: 1.1;">
+                {service.title}
+              </h3>
+              {service.priceLabel && (
+                <span class="font-mono text-xs" style="color: var(--fp-muted)">{service.priceLabel}</span>
+              )}
+            </div>
+            {service.description && (
+              <p class="mt-3 pl-12 text-sm md:text-base" style="color: var(--fp-muted)">{service.description}</p>
+            )}
+          </li>
+        ))}
+      </ol>
+      <div class="mt-8 flex justify-center">
+        <a href="#contact" class="fp-button-outline">Discuss your engagement <Icon name="arrow" size={14} class="ml-2" /></a>
+      </div>
+    </div>
+  )}
 </section>

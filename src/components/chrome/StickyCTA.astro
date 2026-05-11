@@ -1,25 +1,32 @@
 ---
 import { siteDna } from '../../lib/siteDna';
 import { defaultContactInfo } from '../../lib/defaults';
+import { resolveShellMeta } from '../../lib/layoutShell';
 import Icon from '../Icon.astro';
 
 const contact = defaultContactInfo(siteDna.businessInfo);
+const meta = resolveShellMeta(siteDna);
 ---
 
 <div
   class="fp-sticky-cta fixed inset-x-0 bottom-0 z-50 md:hidden"
   style="background: var(--fp-bg); border-top: 1px solid var(--fp-border-on-bg); box-shadow: 0 -8px 24px -12px color-mix(in oklab, var(--fp-on-bg) 25%, transparent);"
+  data-shell={meta.id}
 >
   <div class="grid grid-cols-2 gap-2 p-3">
     <a
       href={contact.phoneHref}
       class="fp-button-outline justify-center text-sm"
-      style="color: var(--fp-on-bg); border-color: var(--fp-border-on-bg);"
+      style="color: var(--fp-on-bg); border-color: var(--fp-border-on-bg); border-radius: var(--nm-radius-pill);"
     >
       <Icon name="phone" size={16} class="mr-2" />
       Call
     </a>
-    <a href="#contact" class="fp-button justify-center text-sm">
+    <a
+      href="#contact"
+      class="fp-button justify-center text-sm"
+      style="border-radius: var(--nm-radius-pill);"
+    >
       <Icon name="mail" size={16} class="mr-2" />
       Get a quote
     </a>
@@ -29,8 +36,6 @@ const contact = defaultContactInfo(siteDna.businessInfo);
 <style>
   /* Add bottom padding so content isn't covered by the sticky bar on mobile. */
   @media (max-width: 767px) {
-    body {
-      padding-bottom: 5rem;
-    }
+    body { padding-bottom: 5rem; }
   }
 </style>

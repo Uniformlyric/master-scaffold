@@ -1,0 +1,182 @@
+---
+/**
+ * preview/[shell]/[vibe].astro
+ *
+ * Dev-gated QA route used by scripts/snapshot-matrix.mjs to walk all
+ * 12 shells x 9 vibes = 108 compositions and snapshot each one.
+ *
+ * The folder is named `preview` (NOT `_preview`) because Astro treats
+ * underscore-prefixed directories in `pages/` as excluded from routing
+ * entirely - `getStaticPaths` is never even called for them. Production
+ * gating happens inside `getStaticPaths` instead: it returns `[]` unless
+ * `process.env.PREVIEW_MATRIX === '1'`.
+ *
+ * Generation gating
+ * ----------------------------------------------------------------
+ *   - `astro dev` with `PREVIEW_MATRIX=1` exposes the route at
+ *     /preview/<shell>/<vibe-slug> for every combo.
+ *   - `astro build` ships ZERO of these pages by default. Production
+ *     bundles never materialize this route.
+ *
+ * Rendering note
+ * ----------------------------------------------------------------
+ * Section components import `siteDna` as a singleton (see
+ * src/lib/siteDna.ts). The combo from the URL is used here for the
+ * blueprint-label overlay only - the matrix script mutates
+ * `site-dna.json` between navigations and relies on Astro HMR to
+ * re-evaluate the singleton with the new shell + vibe pinned.
+ */
+import Layout from '../../../layouts/Layout.astro';
+import SectionRenderer from '../../../components/SectionRenderer.astro';
+import Header from '../../../components/chrome/Header.astro';
+import Footer from '../../../components/chrome/Footer.astro';
+import StickyCTA from '../../../components/chrome/StickyCTA.astro';
+import CTABanner from '../../../components/sections/CTABanner.astro';
+import { siteDna } from '../../../lib/siteDna';
+import { toneClassForIndex } from '../../../lib/multiTone';
+import {
+  resolveShellMeta,
+  nmToneForIndex,
+  nmToneClass,
+} from '../../../lib/layoutShell';
+import { allPreviewCombos, vibeSlug } from '../../../lib/previewSiteDna';
+
+export function getStaticPaths() {
+  if (process.env.PREVIEW_MATRIX !== '1') return [];
+  return allPreviewCombos().map(({ shell, vibe }) => ({
+    params: {
+      shell,
+      vibe: vibeSlug(vibe),
+    },
+    props: {
+      shell,
+      vibe,
+    },
+  }));
+}
+
+interface Props {
+  shell: string;
+  vibe: string;
+}
+
+const { shell: requestedShell, vibe: requestedVibe } = Astro.props;
+
+const DEFAULT_ORDER = [
+  'Hero',
+  'ValueProps',
+  'Services',
+  'SocialProof',
+  'BeforeAfter',
+  'Pricing',
+  'Testimonials',
+  'FAQ',
+  'Contact',
+] as const;
+
+const sections = siteDna.layout.sectionOrder.length > 0
+  ? siteDna.layout.sectionOrder
+  : DEFAULT_ORDER;
+
+const isNuzum = siteDna.designTokens.signature === 'nuzum-method';
+const meta = isNuzum ? resolveShellMeta(siteDna) : null;
+
+const prevTones: (string | undefined)[] = sections.map((_, i) => {
+  if (i === 0) return undefined;
+  if (meta) return nmToneClass(nmToneForIndex(meta, i - 1));
+  return toneClassForIndex(i - 1);
+});
+
+/**
+ * Sanity warning if the live site-dna.json doesn't match the URL combo.
+ * Helpful when devs hit this route manually without snapshot-matrix.mjs.
+ */
+const liveShell = meta?.id ?? siteDna.designTokens.layoutShell ?? null;
+const liveVibe = siteDna.designTokens.vibe;
+const matches =
+  (liveShell === requestedShell || (!liveShell && requestedShell)) &&
+  vibeSlug(liveVibe) === requestedVibe;
+---
+
+<Layout>
+  <Header />
+  <main data-shell={meta?.id} data-density={meta?.density}>
+    {sections.map((section, index) => (
+      <SectionRenderer
+        section={section}
+        index={index}
+        prevTone={prevTones[index]}
+      />
+    ))}
+    <CTABanner />
+  </main>
+  <Footer />
+  <StickyCTA />
+
+  <div class="preview-overlay" data-preview-overlay>
+    <div class="preview-overlay__row">
+      <span class="preview-overlay__label">SHELL</span>
+      <strong class="preview-overlay__value">{requestedShell}</strong>
+    </div>
+    <div class="preview-overlay__row">
+      <span class="preview-overlay__label">VIBE</span>
+      <strong class="preview-overlay__value">{requestedVibe}</strong>
+    </div>
+    {!matches && (
+      <div class="preview-overlay__warn">
+        Live site-dna.json renders {liveShell ?? '(auto)'} / {liveVibe}.
+        Run `node scripts/snapshot-matrix.mjs` to drive this URL.
+      </div>
+    )}
+  </div>
+
+  <script>
+    import { initReveal } from '../../../lib/reveal';
+    initReveal();
+  </script>
+</Layout>
+
+<style>
+  .preview-overlay {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    background: #0f1311;
+    border: 1px solid #2a2f2a;
+    border-radius: 8px;
+    padding: 0.75rem 0.9rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    color: #c8d0c8;
+    max-width: 280px;
+    line-height: 1.4;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+  }
+  .preview-overlay__row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .preview-overlay__label {
+    color: #6a766c;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .preview-overlay__value {
+    color: #e8e4da;
+    font-weight: 500;
+  }
+  .preview-overlay__warn {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #2a2f2a;
+    color: #f4cf6b;
+    font-size: 10px;
+    line-height: 1.45;
+  }
+  @media print {
+    .preview-overlay { display: none; }
+  }
+</style>

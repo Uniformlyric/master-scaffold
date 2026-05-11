@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/signature.css';
 import '../styles/vibes.css';
 import { GOOGLE_FONTS_HREF_BY_VIBE } from '../site-dna/index.js';
 import { siteDna } from '../lib/siteDna';
@@ -14,32 +15,72 @@ const pageTitle = title ?? siteDna.businessInfo.name ?? 'Flashpoint Site';
 const pageDescription =
   description ?? siteDna.businessInfo.valueProp ?? siteDna.businessInfo.tagline ?? '';
 const vibe = siteDna.designTokens.vibe;
-const fontsHref = GOOGLE_FONTS_HREF_BY_VIBE[vibe];
+const signature = siteDna.designTokens.signature;
+const vibeFontsHref = GOOGLE_FONTS_HREF_BY_VIBE[vibe];
+
+/*
+ * Nuzum Method core type system - always loaded so the 4 type roles
+ * (display grotesque / body sans / mono labels / serif italic accent)
+ * are available regardless of which vibe-specific display face is
+ * loaded by GOOGLE_FONTS_HREF_BY_VIBE.
+ *
+ * Curated to what every NM flavor falls back to:
+ *   - Inter             (body sans, universal)
+ *   - Space Grotesk     (display grotesque, universal fallback)
+ *   - JetBrains Mono    (label monospace, universal)
+ *   - Cormorant Garamond (italic accent, universal fallback)
+ */
+const nmCoreFontsHref =
+  'https://fonts.googleapis.com/css2?' +
+  'family=Inter:wght@400;500;600;700&' +
+  'family=Space+Grotesk:wght@400;500;600;700&' +
+  'family=JetBrains+Mono:wght@400;500&' +
+  'family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&' +
+  'display=swap';
 
 const palette = siteDna.designTokens.multiTonePalette;
 const typography = siteDna.designTokens.typography;
 
-// Build the per-lead override block. Falls back to vibes.css when fields absent.
-const overrideStyle = [
-  `--fp-bg: ${palette.surfaceVariants[0] ?? palette.coolTones[0] ?? palette.warmTones[0] ?? '#0F172A'};`,
-  `--fp-surface: ${palette.surfaceVariants[1] ?? palette.warmTones[0] ?? palette.coolTones[1] ?? '#1F2937'};`,
-  palette.warmTones[0] ? `--fp-warm-1: ${palette.warmTones[0]};` : '',
-  palette.coolTones[0] ? `--fp-cool-1: ${palette.coolTones[0]};` : '',
-  `--fp-accent: ${palette.accent};`,
-  palette.ink ? `--fp-ink: ${palette.ink};` : '',
-  palette.muted ? `--fp-muted: ${palette.muted};` : '',
-  `--fp-font-display: ${typography.headingStack};`,
-  `--fp-font-body: ${typography.bodyStack};`,
-  `--fp-radius: ${typography.borderRadius};`,
-  `--fp-border-width: ${typography.borderWidth};`,
-  typography.letterSpacing ? `--fp-letter-spacing: ${typography.letterSpacing};` : '',
-]
-  .filter(Boolean)
-  .join(' ');
+/*
+ * Per-lead override block.
+ *
+ * Under the Nuzum Method signature the obsidian/moss/paper base is owned
+ * by signature.css; we ONLY allow per-lead overrides for the accent and
+ * the type letter-spacing/radius fine-tuning. This keeps every NM site
+ * looking unmistakably "Nuzum" while still respecting wizard-level taste.
+ *
+ * Under any future signature (e.g. 'classic') we'd fall back to the
+ * legacy full palette injection.
+ */
+const isNuzum = signature === 'nuzum-method';
+const overrideStyle = isNuzum
+  ? [
+      `--nm-accent: ${palette.accent};`,
+      `--fp-accent: ${palette.accent};`,
+      typography.letterSpacing ? `--fp-letter-spacing: ${typography.letterSpacing};` : '',
+    ]
+      .filter(Boolean)
+      .join(' ')
+  : [
+      `--fp-bg: ${palette.surfaceVariants[0] ?? palette.coolTones[0] ?? palette.warmTones[0] ?? '#0F172A'};`,
+      `--fp-surface: ${palette.surfaceVariants[1] ?? palette.warmTones[0] ?? palette.coolTones[1] ?? '#1F2937'};`,
+      palette.warmTones[0] ? `--fp-warm-1: ${palette.warmTones[0]};` : '',
+      palette.coolTones[0] ? `--fp-cool-1: ${palette.coolTones[0]};` : '',
+      `--fp-accent: ${palette.accent};`,
+      palette.ink ? `--fp-ink: ${palette.ink};` : '',
+      palette.muted ? `--fp-muted: ${palette.muted};` : '',
+      `--fp-font-display: ${typography.headingStack};`,
+      `--fp-font-body: ${typography.bodyStack};`,
+      `--fp-radius: ${typography.borderRadius};`,
+      `--fp-border-width: ${typography.borderWidth};`,
+      typography.letterSpacing ? `--fp-letter-spacing: ${typography.letterSpacing};` : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
 ---
 
 <!doctype html>
-<html lang="en" data-vibe={vibe}>
+<html lang="en" data-vibe={vibe} data-signature={signature}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -47,7 +88,8 @@ const overrideStyle = [
     <title>{pageTitle}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href={fontsHref} />
+    {isNuzum && <link rel="stylesheet" href={nmCoreFontsHref} />}
+    <link rel="stylesheet" href={vibeFontsHref} />
     <style is:inline set:html={`:root { ${overrideStyle} }`}></style>
   </head>
   <body>

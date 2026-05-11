@@ -1,118 +1,316 @@
 ---
 import { siteDna } from '../../lib/siteDna';
 import {
-  defaultHeroEyebrow,
   defaultValueProp,
   businessInitials,
   trustMicroRow,
 } from '../../lib/defaults';
+import { resolveShellMeta } from '../../lib/layoutShell';
 import Icon from '../Icon.astro';
+import MonogramFigure from '../MonogramFigure.astro';
 
-const { businessInfo, assets, designTokens } = siteDna;
-const eyebrow = defaultHeroEyebrow(businessInfo, designTokens.vibe);
+/**
+ * Hero - facade across 8 per-shell composition variants.
+ *
+ * The active variant is selected from shellMeta.hero (set in layoutShell.ts).
+ * Each variant is a self-contained block within this file.
+ *
+ * Variants:
+ *   stack    - 12-col asymmetric grid, headline overshoots, dual photos peel
+ *   atrium   - centered serif italic statement, masked photo floats below
+ *   ledger   - editorial spread, type-led, sidebar metadata
+ *   vitrine  - hero IS a grid of masked photos floating in a leak field
+ *   marquee  - giant display headline fills the viewport
+ *   split    - 50/50 type+masked photo with off-axis balance
+ *   drift    - multi-layer parallax with two animated leaks
+ *   pill     - minimal type + one masked pill photo (letterhead)
+ *
+ * The blueprint corner label is emitted ONCE by SectionRenderer on the
+ * section wrapper (rotating tl -> tr -> bl -> br across the page). Hero
+ * does NOT render its own corner stamp or any inline `<p>` eyebrow above
+ * the headline; both would re-introduce the templaty stack we are killing.
+ *
+ * The headline scale is `clamp(3.5rem, 11vw, 9rem)` for variants that
+ * need marquee weight (stack, ledger, marquee, split, drift). The smaller
+ * variants (atrium, pill, vitrine) hold ground with their composition
+ * instead of pure type weight.
+ */
+
+const { businessInfo, assets } = siteDna;
 const valueProp = defaultValueProp(businessInfo);
 const initials = businessInitials(businessInfo);
 const trust = trustMicroRow(businessInfo);
 
-/*
- * Hero asset selection rules:
- * - real hero asset that does NOT match the logo storagePath -> use it
- * - missing OR matches the logo -> render a vibe-tinted gradient + monogram block
- *   (never paste the logo as a giant photo, that always reads as a stretched logo)
- */
 const heroAsset = assets.hero;
 const logoAsset = assets.logo;
 const useRealHero = Boolean(
   heroAsset && (!logoAsset || heroAsset.storagePath !== logoAsset.storagePath),
 );
+const galleryAssets = assets.gallery ?? [];
+
+const meta = resolveShellMeta(siteDna);
+const variant = meta.hero;
+const maskClass = `nm-mask-${meta.defaultMask}`;
+const driftAttr: string | undefined = meta.drift === 'none' ? undefined : meta.drift;
+
+const HEADLINE_STYLE_LG = 'font-family: var(--nm-font-display, var(--fp-font-display)); color: var(--fp-ink); font-size: clamp(3.5rem, 11vw, 9rem); line-height: 0.92; letter-spacing: -0.03em;';
+const HEADLINE_STYLE_MD = 'font-family: var(--nm-font-display, var(--fp-font-display)); color: var(--fp-ink); font-size: clamp(2.75rem, 8vw, 6.5rem); line-height: 0.95; letter-spacing: -0.025em;';
+const HEADLINE_STYLE_SM = 'font-family: var(--nm-font-display, var(--fp-font-display)); color: var(--fp-ink); font-size: clamp(2.5rem, 6vw, 5rem); line-height: 0.98; letter-spacing: -0.02em;';
 ---
 
-<section id="top" class="fp-section py-24 md:py-32" data-reveal>
-  <div class="grid items-center gap-10 md:grid-cols-12 md:gap-12">
-    <div class="md:col-span-7 min-w-0">
-      <p
-        class="text-xs font-semibold uppercase tracking-[0.18em]"
-        style="color: var(--fp-accent)"
-      >
-        {eyebrow}
-      </p>
-      <h1
-        class="mt-5 font-display text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl"
-        style="color: var(--fp-ink)"
-      >
+<section
+  id="top"
+  class="fp-section nm-leak-field py-24 md:py-32"
+  data-reveal
+  data-shell-hero={variant}
+>
+  <span class="nm-leak nm-leak--1 nm-leak--tl" aria-hidden="true"></span>
+  {meta.density !== 'quiet' && (
+    <span class="nm-leak nm-leak--2 nm-leak--br" aria-hidden="true"></span>
+  )}
+  {meta.density === 'busy' && (
+    <span class="nm-leak nm-leak--3 nm-leak--bl" aria-hidden="true"></span>
+  )}
+
+  {variant === 'stack' && (
+    <div class="grid items-center gap-y-10 md:grid-cols-12 md:gap-x-12 md:gap-y-0">
+      {/*
+       * Stack variant - the overshooting headline.
+       *
+       * Text spans cols 1-7 but the headline element extends through cols
+       * 1-9 (negative right padding) so it "punches" past its column. The
+       * primary photo spans cols 8-12 and is pushed down 8% so it peels
+       * into the section below. A second masked thumbnail floats at the
+       * bottom-left of the photo column at 40% translateY so it also peels.
+       */}
+      <div class="md:col-span-7 min-w-0 md:pr-[-12%]">
+        <h1 class="md:-mr-[12vw]" style={HEADLINE_STYLE_LG}>
+          {businessInfo.name ?? 'Your Business'}
+        </h1>
+        <p class="mt-8 max-w-xl text-lg leading-relaxed md:text-xl" style="color: var(--fp-muted)">{valueProp}</p>
+        <div class="mt-10 flex flex-wrap items-center gap-3">
+          <a href="#contact" class="fp-button text-base">Get a free quote <Icon name="arrow" size={18} class="ml-2" /></a>
+          <a href="#services" class="fp-button-outline text-base">See services</a>
+        </div>
+      </div>
+      <div class="md:col-span-5 min-w-0 relative">
+        <figure
+          class:list={['relative mx-auto w-full max-w-[480px] overflow-hidden nm-rs-lg md:translate-y-[8%]', maskClass]}
+          style="aspect-ratio: 4 / 5;"
+          data-drift={driftAttr}
+        >
+          {useRealHero && heroAsset ? (
+            <img src={heroAsset.downloadURL} alt={heroAsset.alt ?? businessInfo.name ?? 'hero'} class="nm-cinematic block h-full w-full object-cover" loading="eager" width={heroAsset.width} height={heroAsset.height} />
+          ) : (
+            <MonogramFigure initials={initials} />
+          )}
+        </figure>
+        {galleryAssets[0] && (
+          <figure
+            class="nm-mask-lozenge absolute -bottom-12 -left-2 h-32 w-32 overflow-hidden md:translate-y-[40%]"
+            data-drift="fast"
+          >
+            <img src={galleryAssets[0].downloadURL} alt="" class="nm-cinematic block h-full w-full object-cover" loading="lazy" />
+          </figure>
+        )}
+      </div>
+    </div>
+  )}
+
+  {variant === 'atrium' && (
+    <div class="mx-auto max-w-3xl text-center">
+      <h1 class="text-4xl leading-[1.05] md:text-6xl lg:text-7xl" style="font-family: var(--nm-font-italic, Georgia, serif); font-style: italic; font-weight: 500; color: var(--fp-ink); letter-spacing: -0.01em;">
         {businessInfo.name ?? 'Your Business'}
       </h1>
-      <p
-        class="mt-6 max-w-xl text-lg leading-relaxed md:text-xl"
-        style="color: var(--fp-muted)"
-      >
-        {valueProp}
-      </p>
-
-      <div class="mt-9 flex flex-wrap items-center gap-3">
-        <a href="#contact" class="fp-button text-base">
-          Get a free quote
-          <Icon name="arrow" size={18} class="ml-2" />
-        </a>
-        <a href="#services" class="fp-button-outline text-base">See services</a>
+      <p class="mx-auto mt-8 max-w-xl text-lg md:text-xl" style="color: var(--fp-muted)">{valueProp}</p>
+      <div class="mt-9 flex flex-wrap items-center justify-center gap-3">
+        <a href="#contact" class="fp-button">Get a free quote <Icon name="arrow" size={18} class="ml-2" /></a>
+        <a href="#services" class="fp-button-outline">See services</a>
       </div>
-
-      <ul
-        class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm"
-        style="color: var(--fp-muted)"
-      >
-        <li class="flex items-center gap-1.5">
-          <span class="flex" style="color: var(--fp-accent)">
-            {Array.from({ length: 5 }).map(() => <Icon name="star" size={14} />)}
-          </span>
-          <span style="color: var(--fp-ink)" class="font-semibold">
-            {trust.rating}
-          </span>
-          <span>· {trust.reviews}</span>
-        </li>
-        <li class="hidden items-center gap-1.5 sm:flex">
-          <Icon name="medal" size={14} />
-          <span>{trust.years} in business</span>
-        </li>
-        <li class="hidden items-center gap-1.5 md:flex">
-          <Icon name="check" size={14} />
-          <span>{trust.jobs}</span>
-        </li>
-      </ul>
+      <div class="relative mt-16 flex justify-center" data-drift={driftAttr}>
+        <figure class:list={['relative max-w-[560px] overflow-hidden nm-rs-hero', maskClass]} style="width: 70%; aspect-ratio: 5 / 3;">
+          {useRealHero && heroAsset ? (
+            <img src={heroAsset.downloadURL} alt={heroAsset.alt ?? businessInfo.name ?? 'hero'} class="nm-cinematic block h-full w-full object-cover" loading="eager" />
+          ) : (
+            <MonogramFigure initials={initials} />
+          )}
+        </figure>
+      </div>
     </div>
+  )}
 
-    <div class="md:col-span-5 min-w-0">
-      <figure
-        class="relative mx-auto max-h-[560px] w-full max-w-[480px] overflow-hidden"
-        style="border-radius: var(--fp-radius); border: var(--fp-border-width) solid var(--fp-border-color); aspect-ratio: 4 / 5;"
-      >
-        {useRealHero && heroAsset ? (
-          <img
-            src={heroAsset.downloadURL}
-            alt={heroAsset.alt ?? businessInfo.name ?? 'hero'}
-            class="block h-full w-full object-cover"
-            style="object-position: center;"
-            loading="eager"
-            width={heroAsset.width}
-            height={heroAsset.height}
-          />
-        ) : (
-          <div
-            class="relative flex h-full w-full items-center justify-center"
-            style={`background:
-              radial-gradient(circle at 30% 30%, color-mix(in oklab, var(--fp-accent) 65%, transparent), transparent 60%),
-              radial-gradient(circle at 70% 70%, color-mix(in oklab, var(--fp-warm-1, var(--fp-accent)) 50%, transparent), transparent 65%),
-              color-mix(in oklab, var(--fp-accent) 18%, var(--fp-bg));`}
-          >
-            <span
-              class="font-display text-[7rem] font-bold leading-none tracking-tight md:text-[9rem]"
-              style="color: var(--fp-on-accent); mix-blend-mode: normal; text-shadow: 0 4px 24px color-mix(in oklab, var(--fp-on-accent) 25%, transparent);"
-            >
-              {initials}
-            </span>
+  {variant === 'ledger' && (
+    <div class="grid items-start gap-10 md:grid-cols-12 md:gap-16">
+      <div class="md:col-span-8">
+        <div class="flex items-center gap-3">
+          <span class="nm-rule nm-rule--ticked" style="flex: 0 0 56px;"></span>
+        </div>
+        <h1 class="mt-6" style={HEADLINE_STYLE_LG}>
+          {businessInfo.name ?? 'Your Business'}
+        </h1>
+        <div class="mt-8 grid gap-8 md:grid-cols-2">
+          <p class="text-lg leading-relaxed" style="color: var(--fp-muted)">{valueProp}</p>
+          <div class="space-y-3 border-l pl-6" style="border-color: var(--fp-border-color)">
+            <p class="font-mono text-[10px] uppercase tracking-[0.18em]" style="color: var(--fp-muted)">Reputation</p>
+            <p class="text-sm" style="color: var(--fp-ink)"><span class="font-display text-2xl font-bold" style="color: var(--nm-accent, var(--fp-accent))">{trust.rating}</span> &middot; {trust.reviews}</p>
+            <p class="font-mono text-[10px] uppercase tracking-[0.18em]" style="color: var(--fp-muted)">Established</p>
+            <p class="text-sm" style="color: var(--fp-ink)">{trust.years} in business</p>
+            <p class="font-mono text-[10px] uppercase tracking-[0.18em]" style="color: var(--fp-muted)">Volume</p>
+            <p class="text-sm" style="color: var(--fp-ink)">{trust.jobs}</p>
           </div>
-        )}
-      </figure>
+        </div>
+        <div class="mt-9 flex flex-wrap items-center gap-3">
+          <a href="#contact" class="fp-button">Begin engagement <Icon name="arrow" size={18} class="ml-2" /></a>
+          <a href="#services" class="fp-button-outline">Our services</a>
+        </div>
+      </div>
+      <div class="md:col-span-4" data-drift={driftAttr}>
+        <figure class:list={['relative overflow-hidden nm-rs-md', maskClass]} style="aspect-ratio: 3 / 4;">
+          {useRealHero && heroAsset ? (
+            <img src={heroAsset.downloadURL} alt={heroAsset.alt ?? businessInfo.name ?? 'hero'} class="nm-cinematic block h-full w-full object-cover" loading="eager" />
+          ) : (
+            <MonogramFigure initials={initials} />
+          )}
+        </figure>
+      </div>
     </div>
-  </div>
+  )}
+
+  {variant === 'vitrine' && (
+    <div class="space-y-10">
+      <div class="max-w-3xl">
+        <h1 style={HEADLINE_STYLE_MD}>
+          {businessInfo.name ?? 'Your Business'}
+        </h1>
+      </div>
+      <div class="relative grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
+        {(galleryAssets.length > 0 ? galleryAssets.slice(0, 6) : new Array(6).fill(null)).map((img, i) => {
+          const aspectClass = i % 3 === 0 ? 'aspect-[3/4]' : i % 3 === 1 ? 'aspect-square' : 'aspect-[4/5]';
+          const offset = i % 2 === 0 ? 'md:translate-y-6' : 'md:-translate-y-2';
+          const masks = ['nm-mask-blob', 'nm-mask-lozenge', 'nm-mask-blob-b', 'nm-mask-pill', 'nm-mask-blob-c', 'nm-mask-capsule'];
+          const mask = masks[i % masks.length];
+          return (
+            <figure class:list={['relative overflow-hidden nm-rs-md', mask, aspectClass, offset]}>
+              {img ? (
+                <img src={img.downloadURL} alt={img.alt ?? ''} class="nm-cinematic block h-full w-full object-cover" loading="lazy" />
+              ) : (
+                <MonogramFigure initials={initials} />
+              )}
+            </figure>
+          );
+        })}
+      </div>
+      <div class="grid items-end gap-6 md:grid-cols-12">
+        <p class="md:col-span-7 text-base md:text-xl" style="color: var(--fp-muted)">{valueProp}</p>
+        <div class="md:col-span-5 flex flex-wrap items-center gap-3 md:justify-end">
+          <a href="#contact" class="fp-button">Inquire <Icon name="arrow" size={18} class="ml-2" /></a>
+          <a href="#services" class="fp-button-outline">See services</a>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {variant === 'marquee' && (
+    <div class="space-y-12">
+      <h1 class="font-display font-bold" style={HEADLINE_STYLE_LG}>
+        {(businessInfo.valueProp ?? businessInfo.name ?? 'Your Business').slice(0, 90)}
+      </h1>
+      <div class="grid items-end gap-6 md:grid-cols-12">
+        <div class="md:col-span-7">
+          <p class="text-lg md:text-xl" style="color: var(--fp-muted)">{valueProp}</p>
+        </div>
+        <div class="md:col-span-3 md:col-start-9 flex justify-end" data-drift={driftAttr}>
+          <figure class:list={['relative h-32 w-32 overflow-hidden', maskClass]}>
+            {useRealHero && heroAsset ? (
+              <img src={heroAsset.downloadURL} alt={heroAsset.alt ?? ''} class="nm-cinematic block h-full w-full object-cover" />
+            ) : (
+              <MonogramFigure initials={initials} />
+            )}
+          </figure>
+        </div>
+        <div class="md:col-span-12 mt-4 flex flex-wrap items-center gap-3">
+          <a href="#contact" class="fp-button text-base">Get a free quote <Icon name="arrow" size={18} class="ml-2" /></a>
+          <a href="#services" class="fp-button-outline text-base">See services</a>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {variant === 'split' && (
+    <div class="grid items-center gap-10 md:grid-cols-12 md:gap-16">
+      <div class="md:col-span-6">
+        <h1 style={HEADLINE_STYLE_LG}>
+          {businessInfo.name ?? 'Your Business'}
+        </h1>
+        <p class="mt-8 max-w-md text-lg md:text-xl" style="color: var(--fp-muted)">{valueProp}</p>
+        <div class="mt-10 flex flex-wrap items-center gap-3">
+          <a href="#contact" class="fp-button">Get a free quote <Icon name="arrow" size={18} class="ml-2" /></a>
+          <a href="#services" class="fp-button-outline">See services</a>
+        </div>
+        <ul class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm" style="color: var(--fp-muted)">
+          <li class="flex items-center gap-1.5"><span class="flex" style="color: var(--nm-accent, var(--fp-accent))">{Array.from({ length: 5 }).map(() => <Icon name="star" size={14} />)}</span><span style="color: var(--fp-ink)" class="font-semibold">{trust.rating}</span><span>&middot; {trust.reviews}</span></li>
+        </ul>
+      </div>
+      <div class="md:col-span-6 md:translate-y-6" data-drift={driftAttr}>
+        <figure class:list={['relative overflow-hidden nm-rs-lg', maskClass]} style="aspect-ratio: 4 / 5;">
+          {useRealHero && heroAsset ? (
+            <img src={heroAsset.downloadURL} alt={heroAsset.alt ?? businessInfo.name ?? 'hero'} class="nm-cinematic block h-full w-full object-cover" loading="eager" width={heroAsset.width} height={heroAsset.height} />
+          ) : (
+            <MonogramFigure initials={initials} />
+          )}
+        </figure>
+      </div>
+    </div>
+  )}
+
+  {variant === 'drift' && (
+    <div class="relative grid items-center gap-12 md:grid-cols-12">
+      <span class="nm-leak nm-leak--3 nm-leak--alive nm-leak--c" aria-hidden="true"></span>
+      <div class="md:col-span-7 min-w-0">
+        <h1 style={HEADLINE_STYLE_LG}>
+          {businessInfo.name ?? 'Your Business'}
+        </h1>
+        <p class="mt-8 max-w-xl text-lg leading-relaxed md:text-xl" style="color: var(--fp-muted)">{valueProp}</p>
+        <div class="mt-10 flex flex-wrap items-center gap-3">
+          <a href="#contact" class="fp-button text-base">Get a free quote <Icon name="arrow" size={18} class="ml-2" /></a>
+          <a href="#services" class="fp-button-outline text-base">See services</a>
+        </div>
+      </div>
+      <div class="md:col-span-5 relative min-w-0">
+        <figure class="relative mx-auto overflow-hidden nm-mask-blob nm-rs-hero" style="aspect-ratio: 4 / 5; max-width: 480px;" data-drift="slow">
+          {useRealHero && heroAsset ? (
+            <img src={heroAsset.downloadURL} alt={heroAsset.alt ?? businessInfo.name ?? 'hero'} class="nm-cinematic block h-full w-full object-cover" loading="eager" />
+          ) : (
+            <MonogramFigure initials={initials} />
+          )}
+        </figure>
+        {galleryAssets[0] && (
+          <figure class="absolute -bottom-6 -left-6 h-32 w-32 overflow-hidden nm-mask-pill" data-drift="fast">
+            <img src={galleryAssets[0].downloadURL} alt="" class="nm-cinematic block h-full w-full object-cover" loading="lazy" />
+          </figure>
+        )}
+      </div>
+    </div>
+  )}
+
+  {variant === 'pill' && (
+    <div class="mx-auto max-w-3xl space-y-12 text-center">
+      <h1 style={HEADLINE_STYLE_SM}>
+        {businessInfo.name ?? 'Your Business'}
+      </h1>
+      <p class="mx-auto max-w-lg text-lg md:text-xl" style="color: var(--fp-muted)">{valueProp}</p>
+      <div class="flex justify-center">
+        <figure class="relative h-48 w-72 overflow-hidden nm-mask-pill nm-cinematic" data-drift={driftAttr}>
+          {useRealHero && heroAsset ? (
+            <img src={heroAsset.downloadURL} alt={heroAsset.alt ?? ''} class="block h-full w-full object-cover" loading="eager" />
+          ) : (
+            <MonogramFigure initials={initials} />
+          )}
+        </figure>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <a href="#contact" class="fp-button">Get in touch <Icon name="arrow" size={18} class="ml-2" /></a>
+      </div>
+    </div>
+  )}
 </section>

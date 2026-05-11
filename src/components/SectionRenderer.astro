@@ -15,6 +15,33 @@ import SectionDivider from './SectionDivider.astro';
 import { shouldUseGradient, toneClassForIndex } from '../lib/multiTone';
 import { siteDna } from '../lib/siteDna';
 import { meshGradientFor } from '../lib/meshGradient';
+import {
+  resolveShellMeta,
+  nmToneForIndex,
+  nmToneClass,
+  shellAttrsFor,
+} from '../lib/layoutShell';
+import { cornerForIndex, cornerClass, labelTextFor } from '../lib/sectionLabel';
+import { scrapsFor, scrapCornerClass } from '../lib/scrapText';
+
+/**
+ * Section -> blueprint-label name. The "label" is the display word shown
+ * in the corner stamp (e.g. "OPENING" instead of "HERO"). Reads as
+ * architect's annotation, not as a UI affordance.
+ */
+const SECTION_LABEL_NAME: Readonly<Record<Section, string>> = {
+  Hero: 'Opening',
+  ValueProps: 'Principles',
+  Services: 'Practice',
+  SocialProof: 'Endorsements',
+  BeforeAfter: 'Transformations',
+  Pricing: 'Ledger',
+  Testimonials: 'Voices',
+  Logo: 'Mark',
+  Gallery: 'Selected Work',
+  FAQ: 'Reference',
+  Contact: 'Correspondence',
+};
 
 interface Props {
   section: Section;
@@ -23,20 +50,93 @@ interface Props {
 }
 
 const { section, index, prevTone } = Astro.props;
-const tone = toneClassForIndex(index);
-const useGradient = shouldUseGradient(section, index)
-  && (siteDna.designTokens.animations?.enableGradients ?? true);
-const useMesh = useGradient && siteDna.designTokens.vibe === 'The Modern';
-const meshStyle = useMesh ? `background: ${meshGradientFor(siteDna.designTokens.multiTonePalette)};` : '';
+const isNuzum = siteDna.designTokens.signature === 'nuzum-method';
 const vibe = siteDna.designTokens.vibe;
-const showDivider = prevTone && prevTone !== tone;
+
+/*
+ * Tone selection.
+ *
+ * Under the Nuzum Method signature, the active layout shell decides the tone
+ * cycle (e.g. portico = mostly obsidian, letterhead = paper/obsidian/paper).
+ * The fp-tone-* classes still apply alongside as a compat shim so any
+ * component still reading --fp-ink picks up the right ink for the new tone
+ * (signature.css re-binds --fp-ink -> --nm-on-* for each .nm-tone-* class).
+ *
+ * Under any other signature, fall back to the legacy fp-tone cycling.
+ */
+const meta = isNuzum ? resolveShellMeta(siteDna) : null;
+const nmTone = meta ? nmToneForIndex(meta, index) : null;
+const nmToneCls = nmTone ? nmToneClass(nmTone) : null;
+const fpTone = toneClassForIndex(index);
+const tone = nmToneCls ?? fpTone;
+
+const useGradient = !isNuzum
+  && shouldUseGradient(section, index)
+  && (siteDna.designTokens.animations?.enableGradients ?? true);
+const useMesh = useGradient && vibe === 'The Modern';
+const meshStyle = useMesh ? `background: ${meshGradientFor(siteDna.designTokens.multiTonePalette)};` : '';
+
+const showDivider = (prevTone && prevTone !== tone) || (meta?.forceDividers && index > 0);
+
+const shellAttrs = meta ? shellAttrsFor(meta) : null;
+
+/*
+ * Centralized blueprint corner label.
+ *
+ * Under NM the corner label is emitted ONCE here, on the section wrapper,
+ * rather than duplicated inside each section component. The rotation is
+ * deterministic via cornerForIndex so the labels move tl -> tr -> bl -> br
+ * across the page, breaking the cookie-cutter "every section has the same
+ * eyebrow above the headline" pattern.
+ *
+ * Section components no longer emit their own .nm-label corner stamps OR
+ * inline font-mono eyebrow paragraphs - the wrapper owns it.
+ */
+const labelCorner = meta ? cornerForIndex(meta, index) : 'tl';
+const labelText = meta ? labelTextFor(meta, SECTION_LABEL_NAME[section] ?? section) : null;
+
+/*
+ * Floating scrap tickers - 1 or 2 mono micro-labels per section, picked
+ * deterministically so the preview matrix stays reproducible. Filtered to
+ * skip the corner already occupied by the blueprint label so we don't
+ * collide.
+ */
+const scraps = isNuzum ? scrapsFor(siteDna, section).filter((s) => s.corner !== labelCorner) : [];
+/*
+ * Tone-pair attrs feed Phase H's peel/divider rules and the new SectionDivider
+ * SVG variants. We attach prev + cur tone (paper|moss|obsidian|leak) so CSS
+ * and the divider component can choose slope/curve/torn-paper/hairline.
+ */
+const tonePrev = prevTone?.replace('nm-tone-', '').replace('fp-tone-', '') ?? null;
+const toneCur = nmTone ?? (fpTone ? fpTone.replace('fp-tone-', '') : null);
+const peelStrength = meta?.peelStrength ?? 0;
+const peelIn = isNuzum && peelStrength >= 1 && tonePrev && toneCur && tonePrev !== toneCur ? '' : undefined;
 ---
 
 <div
   class:list={[tone, useGradient && !useMesh && 'fp-gradient', 'fp-section-wrap']}
   style={meshStyle}
+  data-section={section}
+  data-section-index={index}
+  data-shell={shellAttrs?.['data-shell']}
+  data-density={shellAttrs?.['data-density']}
+  data-label-position={shellAttrs?.['data-label-position']}
+  data-mask={shellAttrs?.['data-mask']}
+  data-peel={shellAttrs?.['data-peel']}
+  data-drift={shellAttrs?.['data-drift']}
+  data-rules={shellAttrs?.['data-rules']}
+  data-tone={nmTone}
+  data-tone-prev={tonePrev}
+  data-tone-cur={toneCur}
+  data-peel-in={peelIn}
 >
-  {showDivider && <SectionDivider prevTone={prevTone} vibe={vibe} />}
+  {showDivider && <SectionDivider prevTone={prevTone} curTone={tone} vibe={vibe} />}
+  {isNuzum && labelText && (
+    <span class:list={['nm-label', cornerClass(labelCorner)]}>{labelText}</span>
+  )}
+  {scraps.map((scrap) => (
+    <span class:list={['nm-scrap', scrapCornerClass(scrap.corner)]}>{scrap.text}</span>
+  ))}
   {section === 'Hero' && <Hero />}
   {section === 'Services' && <Services />}
   {section === 'Testimonials' && <Testimonials />}
@@ -49,3 +149,15 @@ const showDivider = prevTone && prevTone !== tone;
   {section === 'ValueProps' && <ValueProps />}
   {section === 'FAQ' && <FAQ />}
 </div>
+
+<style is:inline>
+  /*
+   * The wrapper is the relative parent for the corner label, peel anchor,
+   * and any leak descendants. Sections inside drop their own relative
+   * containment to inherit this one.
+   */
+  .fp-section-wrap {
+    position: relative;
+    isolation: isolate;
+  }
+</style>

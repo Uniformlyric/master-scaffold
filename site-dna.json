@@ -23,6 +23,7 @@
   },
   "designTokens": {
     "vibe": "The Bold",
+    "signature": "nuzum-method",
     "animations": {
       "enableGradients": true,
       "reducedMotionFallback": true

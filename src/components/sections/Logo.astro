@@ -1,10 +1,13 @@
 ---
 import { siteDna } from '../../lib/siteDna';
 import { businessInitials } from '../../lib/defaults';
+import { resolveShellMeta } from '../../lib/layoutShell';
 
 const logo = siteDna.assets.logo;
 const name = siteDna.businessInfo.name ?? '';
 const initials = businessInitials(siteDna.businessInfo);
+const meta = resolveShellMeta(siteDna);
+const maskClass = `nm-mask-${meta.defaultMask}`;
 ---
 
 <section class="fp-section py-12" data-reveal>
@@ -19,14 +22,14 @@ const initials = businessInitials(siteDna.businessInfo);
       />
     ) : (
       <span
-        class="flex h-20 w-20 items-center justify-center font-display text-2xl font-bold"
-        style="background: color-mix(in oklab, var(--fp-accent) 18%, transparent); color: var(--fp-accent); border-radius: var(--fp-radius);"
+        class:list={['flex h-20 w-20 items-center justify-center font-display text-2xl font-bold', maskClass]}
+        style="background: color-mix(in oklab, var(--nm-accent, var(--fp-accent)) 18%, transparent); color: var(--nm-accent, var(--fp-accent));"
       >
         {initials}
       </span>
     )}
     {name && (
-      <p class="font-display text-lg" style="color: var(--fp-ink)">
+      <p class="font-display text-lg" style="font-family: var(--nm-font-display, var(--fp-font-display)); color: var(--fp-ink)">
         {name}
       </p>
     )}

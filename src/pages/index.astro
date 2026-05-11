@@ -7,6 +7,7 @@ import StickyCTA from '../components/chrome/StickyCTA.astro';
 import CTABanner from '../components/sections/CTABanner.astro';
 import { siteDna } from '../lib/siteDna';
 import { toneClassForIndex } from '../lib/multiTone';
+import { resolveShellMeta, nmToneForIndex, nmToneClass } from '../lib/layoutShell';
 
 const DEFAULT_ORDER = [
   'Hero',
@@ -23,16 +24,30 @@ const DEFAULT_ORDER = [
 const sections = siteDna.layout.sectionOrder.length > 0
   ? siteDna.layout.sectionOrder
   : DEFAULT_ORDER;
+
+const isNuzum = siteDna.designTokens.signature === 'nuzum-method';
+const meta = isNuzum ? resolveShellMeta(siteDna) : null;
+
+/**
+ * Compute the previous-section tone for each section so SectionRenderer
+ * knows whether to draw a divider. Under NM, use shell tone cycling;
+ * else fall back to the legacy fp-tone-* cycle.
+ */
+const prevTones: (string | undefined)[] = sections.map((_, i) => {
+  if (i === 0) return undefined;
+  if (meta) return nmToneClass(nmToneForIndex(meta, i - 1));
+  return toneClassForIndex(i - 1);
+});
 ---
 
 <Layout>
   <Header />
-  <main>
+  <main data-shell={meta?.id} data-density={meta?.density}>
     {sections.map((section, index) => (
       <SectionRenderer
         section={section}
         index={index}
-        prevTone={index > 0 ? toneClassForIndex(index - 1) : undefined}
+        prevTone={prevTones[index]}
       />
     ))}
     <CTABanner />

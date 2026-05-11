@@ -1,40 +1,57 @@
 ---
 import { siteDna } from '../../lib/siteDna';
 import { defaultTestimonials } from '../../lib/defaults';
+import { resolveShellMeta } from '../../lib/layoutShell';
 import Icon from '../Icon.astro';
 
-const testimonials = defaultTestimonials(siteDna.businessInfo);
+const allTestimonials = defaultTestimonials(siteDna.businessInfo);
+const meta = resolveShellMeta(siteDna);
+const testimonials = meta.density === 'quiet' ? allTestimonials.slice(0, 1) : allTestimonials;
+const driftAttr: string | undefined = meta.drift === 'none' ? undefined : meta.drift;
+
+const layoutClass = meta.density === 'quiet' ? 'mx-auto max-w-2xl' : 'grid gap-6 md:grid-cols-3';
 ---
 
-<section id="testimonials" class="fp-section" data-reveal>
-  <div class="mx-auto max-w-2xl text-center">
-    <p class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--fp-accent)">
-      Real reviews
-    </p>
-    <h2
-      class="mt-3 font-display text-3xl font-semibold md:text-4xl lg:text-5xl"
-      style="color: var(--fp-ink)"
-    >
-      What customers say
+<section id="testimonials" class="fp-section nm-leak-field" data-reveal>
+  {meta.density === 'busy' && (
+    <span class="nm-leak nm-leak--3 nm-leak--br" aria-hidden="true"></span>
+  )}
+
+  <div class="max-w-3xl">
+    <h2 class="font-display text-4xl font-semibold md:text-5xl lg:text-6xl" style="font-family: var(--nm-font-display, var(--fp-font-display)); color: var(--fp-ink); letter-spacing: -0.015em; line-height: 0.98;">
+      What customers say.
     </h2>
   </div>
 
-  <div class="mt-12 grid gap-6 md:grid-cols-3">
-    {testimonials.map((t) => (
-      <figure class="fp-card flex h-full flex-col">
-        <div class="flex items-center gap-1" style="color: var(--fp-accent)">
+  <div class:list={['mt-12', layoutClass]}>
+    {testimonials.map((t, idx) => (
+      <figure
+        class:list={[
+          'fp-card flex h-full flex-col',
+          meta.peelStrength >= 1 && idx === 1 && 'nm-peel-1',
+          meta.density === 'quiet' && 'border-l-4',
+        ]}
+        style="border-radius: var(--nm-radius-md, var(--fp-radius));"
+        data-drift={idx === 1 ? driftAttr : undefined}
+      >
+        <div class="flex items-center gap-1" style="color: var(--nm-accent, var(--fp-accent))">
           {Array.from({ length: 5 }).map(() => <Icon name="star" size={16} />)}
         </div>
         <blockquote
-          class="mt-4 flex-1 text-base leading-relaxed md:text-lg"
-          style="color: var(--fp-ink)"
+          class:list={[
+            'mt-4 flex-1',
+            meta.density === 'quiet' ? 'text-xl md:text-2xl' : 'text-base leading-relaxed md:text-lg',
+          ]}
+          style={meta.density === 'quiet'
+            ? 'font-family: var(--nm-font-italic, Georgia, serif); font-style: italic; color: var(--fp-ink); line-height: 1.4;'
+            : 'color: var(--fp-ink);'}
         >
           &ldquo;{t.quote}&rdquo;
         </blockquote>
         <figcaption class="mt-6 flex items-center gap-3">
           <span
-            class="flex h-10 w-10 items-center justify-center font-display text-sm font-bold"
-            style="background: color-mix(in oklab, var(--fp-accent) 22%, transparent); color: var(--fp-accent); border-radius: 999px;"
+            class="flex h-10 w-10 items-center justify-center font-mono text-sm font-bold"
+            style="background: color-mix(in oklab, var(--nm-accent, var(--fp-accent)) 22%, transparent); color: var(--nm-accent, var(--fp-accent)); border-radius: 999px;"
           >
             {t.initials}
           </span>

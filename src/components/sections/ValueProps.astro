@@ -1,30 +1,45 @@
 ---
 import { siteDna } from '../../lib/siteDna';
 import { defaultValueProps } from '../../lib/defaults';
+import { resolveShellMeta } from '../../lib/layoutShell';
 import Icon from '../Icon.astro';
 
 const props = defaultValueProps(siteDna.businessInfo);
+const meta = resolveShellMeta(siteDna);
+const driftAttr: string | undefined = meta.drift === 'none' ? undefined : meta.drift;
 ---
 
-<section class="fp-section py-16 md:py-20" data-reveal>
+<section
+  class="fp-section nm-leak-field py-16 md:py-20"
+  data-reveal
+>
+  {meta.density === 'busy' && (
+    <span class="nm-leak nm-leak--3 nm-leak--tr" aria-hidden="true"></span>
+  )}
   <div class="grid gap-6 md:grid-cols-3">
-    {props.map((p) => (
+    {props.map((p, idx) => (
       <div
-        class="flex h-full flex-col items-start gap-4 p-6"
-        style="border: var(--fp-border-width) solid var(--fp-border-color); border-radius: var(--fp-radius);"
+        class:list={[
+          'flex h-full flex-col items-start gap-4 p-6',
+          meta.peelStrength >= 1 && idx === 1 && 'nm-peel-1',
+          meta.peelStrength === 2 && idx === 2 && 'nm-peel-2',
+        ]}
+        style="border: var(--fp-border-width) solid var(--fp-border-color); border-radius: var(--nm-radius-md, var(--fp-radius));"
+        data-drift={idx === 1 ? driftAttr : undefined}
       >
         <span
           class="flex h-12 w-12 items-center justify-center"
-          style="background: color-mix(in oklab, var(--fp-accent) 18%, transparent); color: var(--fp-accent); border-radius: var(--fp-radius);"
+          style="background: color-mix(in oklab, var(--nm-accent, var(--fp-accent)) 18%, transparent); color: var(--nm-accent, var(--fp-accent)); border-radius: var(--nm-radius-sm, var(--fp-radius));"
         >
           <Icon name={p.icon} size={24} />
         </span>
-        <h3 class="font-display text-lg font-semibold" style="color: var(--fp-ink)">
-          {p.title}
-        </h3>
-        <p class="text-sm leading-relaxed" style="color: var(--fp-muted)">
-          {p.blurb}
-        </p>
+        {meta.exposedRules && (
+          <span class="font-mono text-[10px] uppercase tracking-[0.18em]" style="color: var(--fp-muted)">
+            N°{String(idx + 1).padStart(2, '0')}
+          </span>
+        )}
+        <h3 class="font-display text-lg font-semibold" style="font-family: var(--nm-font-display, var(--fp-font-display)); color: var(--fp-ink)">{p.title}</h3>
+        <p class="text-sm leading-relaxed" style="color: var(--fp-muted)">{p.blurb}</p>
       </div>
     ))}
   </div>

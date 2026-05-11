@@ -1,0 +1,38 @@
+---
+/**
+ * Hero/photo fallback when no real image is available.
+ * Renders the business initials over a leak-tinted radial gradient that
+ * reads correctly on every Nuzum Method tone.
+ */
+interface Props {
+  initials: string;
+}
+const { initials } = Astro.props;
+---
+
+<div class="nm-monogram">
+  <span class="nm-monogram-initials">{initials}</span>
+</div>
+
+<style is:inline>
+  .nm-monogram {
+    position: relative;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(circle at 30% 30%, color-mix(in oklab, var(--nm-leak-1, var(--fp-accent)) 65%, transparent), transparent 60%),
+      radial-gradient(circle at 70% 70%, color-mix(in oklab, var(--nm-leak-2, var(--fp-warm-1, var(--fp-accent))) 50%, transparent), transparent 65%),
+      color-mix(in oklab, var(--nm-leak-1, var(--fp-accent)) 18%, var(--nm-bg, var(--fp-bg)));
+    color: var(--nm-on-leak, var(--fp-on-accent));
+  }
+  .nm-monogram-initials {
+    font-family: var(--nm-font-display, var(--fp-font-display));
+    font-size: clamp(4rem, 18vw, 9rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+</style>

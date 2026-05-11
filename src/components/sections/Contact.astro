@@ -1,122 +1,151 @@
 ---
 import { siteDna } from '../../lib/siteDna';
 import { defaultContactInfo } from '../../lib/defaults';
+import { resolveShellMeta } from '../../lib/layoutShell';
 import Icon from '../Icon.astro';
 
 const { businessInfo } = siteDna;
 const contact = defaultContactInfo(businessInfo);
 const name = businessInfo.name ?? 'us';
+const meta = resolveShellMeta(siteDna);
+
+/**
+ * Contact variant resolution.
+ *
+ *  split-form        - 2-column form + sidebar (default)
+ *  letterhead-block  - centered, type-led, no aside
+ */
+function contactVariantFor(shellId: string): 'split-form' | 'letterhead-block' {
+  switch (shellId) {
+    case 'letterhead':
+    case 'portico':
+    case 'ledger':
+      return 'letterhead-block';
+    default:
+      return 'split-form';
+  }
+}
+
+const variant = contactVariantFor(meta.id);
 ---
 
-<section id="contact" class="fp-section" data-reveal>
-  <div class="grid gap-10 md:grid-cols-12">
-    <div class="md:col-span-7">
-      <div class="fp-card">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--fp-accent)">
-          Get in touch
-        </p>
-        <h2
-          class="mt-3 font-display text-3xl font-semibold md:text-4xl"
-          style="color: var(--fp-ink)"
-        >
-          Tell us about your project
-        </h2>
-        <p class="mt-3 text-base" style="color: var(--fp-muted)">
-          Reach out to {name} and we&rsquo;ll respond within one business day.
-        </p>
+<section
+  id="contact"
+  class="fp-section nm-leak-field"
+  data-reveal
+  data-shell-contact={variant}
+>
+  <span class="nm-leak nm-leak--3 nm-leak--bl" aria-hidden="true"></span>
 
-        <form class="mt-8 grid gap-4 md:grid-cols-2" method="post" action="#">
-          <label class="flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
-            <span>Name</span>
-            <input name="name" required class="fp-input" autocomplete="name" />
-          </label>
-          <label class="flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
-            <span>Email</span>
-            <input type="email" name="email" required class="fp-input" autocomplete="email" />
-          </label>
-          <label class="flex flex-col gap-1.5 text-sm font-medium md:col-span-2" style="color: var(--fp-ink)">
-            <span>Phone (optional)</span>
-            <input type="tel" name="phone" class="fp-input" autocomplete="tel" />
-          </label>
-          <label class="md:col-span-2 flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
-            <span>How can we help?</span>
-            <textarea
-              name="message"
-              rows="5"
-              required
-              class="fp-input"
-              style="resize: vertical;"
-            />
-          </label>
-          <div class="md:col-span-2 flex flex-wrap items-center justify-between gap-4">
-            <p class="text-xs" style="color: var(--fp-muted)">
-              We respect your privacy. No spam, ever.
-            </p>
-            <button type="submit" class="fp-button">
-              Send message
-              <Icon name="arrow" size={16} class="ml-2" />
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <aside class="md:col-span-5">
-      <div class="fp-card flex h-full flex-col">
-        <h3 class="font-display text-xl font-semibold" style="color: var(--fp-ink)">
-          Other ways to reach {name}
-        </h3>
-
-        <ul class="mt-6 space-y-4 text-sm">
-          <li class="flex items-start gap-3">
-            <span style="color: var(--fp-accent)"><Icon name="phone" size={18} /></span>
-            <div>
-              <p class="font-semibold" style="color: var(--fp-ink)">Phone</p>
-              <a href={contact.phoneHref} class="hover:underline" style="color: var(--fp-muted)">
-                {contact.phone}
-              </a>
+  {variant === 'split-form' && (
+    <div class="grid gap-10 md:grid-cols-12">
+      <div class="md:col-span-7">
+        <div class="fp-card" style="border-radius: var(--nm-radius-lg, var(--fp-radius));">
+          <h2 class="font-display text-4xl font-semibold md:text-5xl lg:text-6xl" style="font-family: var(--nm-font-display, var(--fp-font-display)); color: var(--fp-ink); letter-spacing: -0.015em; line-height: 0.98;">
+            Tell us about your project.
+          </h2>
+          <p class="mt-5 max-w-prose text-base" style="color: var(--fp-muted)">
+            Reach out to {name} and we&rsquo;ll respond within one business day.
+          </p>
+          <form class="mt-8 grid gap-4 md:grid-cols-2" method="post" action="#">
+            <label class="flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
+              <span>Name</span>
+              <input name="name" required class="fp-input" autocomplete="name" />
+            </label>
+            <label class="flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
+              <span>Email</span>
+              <input type="email" name="email" required class="fp-input" autocomplete="email" />
+            </label>
+            <label class="flex flex-col gap-1.5 text-sm font-medium md:col-span-2" style="color: var(--fp-ink)">
+              <span>Phone (optional)</span>
+              <input type="tel" name="phone" class="fp-input" autocomplete="tel" />
+            </label>
+            <label class="md:col-span-2 flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
+              <span>How can we help?</span>
+              <textarea name="message" rows="5" required class="fp-input" style="resize: vertical;" />
+            </label>
+            <div class="md:col-span-2 flex flex-wrap items-center justify-between gap-4">
+              <p class="text-xs" style="color: var(--fp-muted)">We respect your privacy. No spam, ever.</p>
+              <button type="submit" class="fp-button">Send message <Icon name="arrow" size={16} class="ml-2" /></button>
             </div>
-          </li>
-          <li class="flex items-start gap-3">
-            <span style="color: var(--fp-accent)"><Icon name="mail" size={18} /></span>
-            <div>
-              <p class="font-semibold" style="color: var(--fp-ink)">Email</p>
-              <a href={contact.emailHref} class="hover:underline" style="color: var(--fp-muted)">
-                {contact.email}
-              </a>
-            </div>
-          </li>
-          <li class="flex items-start gap-3">
-            <span style="color: var(--fp-accent)"><Icon name="clock" size={18} /></span>
-            <div>
-              <p class="font-semibold" style="color: var(--fp-ink)">Hours</p>
-              <p style="color: var(--fp-muted)">{contact.hours}</p>
-            </div>
-          </li>
-          <li class="flex items-start gap-3">
-            <span style="color: var(--fp-accent)"><Icon name="pin" size={18} /></span>
-            <div>
-              <p class="font-semibold" style="color: var(--fp-ink)">Service area</p>
-              <p style="color: var(--fp-muted)">{contact.address}</p>
-            </div>
-          </li>
-        </ul>
-
-        <div
-          class="mt-6 flex aspect-[5/3] items-center justify-center"
-          style="background:
-            linear-gradient(135deg, color-mix(in oklab, var(--fp-accent) 22%, transparent), color-mix(in oklab, var(--fp-warm-1, var(--fp-accent)) 22%, transparent)),
-            color-mix(in oklab, var(--fp-ink) 8%, transparent);
-            border: var(--fp-border-width) solid var(--fp-border-color);
-            border-radius: var(--fp-radius);
-            color: var(--fp-muted);"
-        >
-          <span class="flex items-center gap-2 text-xs uppercase tracking-widest">
-            <Icon name="pin" size={16} />
-            Map placeholder
-          </span>
+          </form>
         </div>
       </div>
-    </aside>
-  </div>
+      <aside class="md:col-span-5">
+        <div class="fp-card flex h-full flex-col" style="border-radius: var(--nm-radius-lg, var(--fp-radius));">
+          <h3 class="font-display text-xl font-semibold" style="color: var(--fp-ink)">Other ways to reach {name}</h3>
+          <ul class="mt-6 space-y-4 text-sm">
+            <li class="flex items-start gap-3">
+              <span style="color: var(--nm-accent, var(--fp-accent))"><Icon name="phone" size={18} /></span>
+              <div><p class="font-semibold" style="color: var(--fp-ink)">Phone</p><a href={contact.phoneHref} class="hover:underline" style="color: var(--fp-muted)">{contact.phone}</a></div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span style="color: var(--nm-accent, var(--fp-accent))"><Icon name="mail" size={18} /></span>
+              <div><p class="font-semibold" style="color: var(--fp-ink)">Email</p><a href={contact.emailHref} class="hover:underline" style="color: var(--fp-muted)">{contact.email}</a></div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span style="color: var(--nm-accent, var(--fp-accent))"><Icon name="clock" size={18} /></span>
+              <div><p class="font-semibold" style="color: var(--fp-ink)">Hours</p><p style="color: var(--fp-muted)">{contact.hours}</p></div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span style="color: var(--nm-accent, var(--fp-accent))"><Icon name="pin" size={18} /></span>
+              <div><p class="font-semibold" style="color: var(--fp-ink)">Service area</p><p style="color: var(--fp-muted)">{contact.address}</p></div>
+            </li>
+          </ul>
+          <div
+            class="nm-mask-lozenge mt-6 flex aspect-[5/3] items-center justify-center"
+            style="background:
+              linear-gradient(135deg, color-mix(in oklab, var(--nm-leak-1, var(--fp-accent)) 32%, transparent), color-mix(in oklab, var(--nm-leak-2, var(--fp-warm-1, var(--fp-accent))) 32%, transparent)),
+              color-mix(in oklab, var(--fp-ink) 8%, transparent);
+              color: var(--fp-muted);"
+          >
+            <span class="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em]">
+              <Icon name="pin" size={14} /> Service area
+            </span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  )}
+
+  {variant === 'letterhead-block' && (
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="font-display font-semibold leading-[0.95] tracking-tight" style="font-family: var(--nm-font-display, var(--fp-font-display)); color: var(--fp-ink); font-size: clamp(3rem, 8vw, 6rem); letter-spacing: -0.025em;">
+        Tell us about your project.
+      </h2>
+      <p class="mt-8 text-base md:text-lg" style="color: var(--fp-muted)">
+        Reach out to {name} and we&rsquo;ll respond within one business day.
+      </p>
+      <hr class="nm-rule nm-rule--ticked mx-auto mt-10" style="max-width: 200px;" />
+      <div class="mt-10 grid gap-6 text-left md:grid-cols-2">
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-[0.18em]" style="color: var(--fp-muted)">By phone</p>
+          <a href={contact.phoneHref} class="mt-2 block font-display text-2xl font-semibold tracking-tight hover:underline" style="color: var(--fp-ink)">{contact.phone}</a>
+          <p class="mt-1 text-sm" style="color: var(--fp-muted)">{contact.hours}</p>
+        </div>
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-[0.18em]" style="color: var(--fp-muted)">By email</p>
+          <a href={contact.emailHref} class="mt-2 block font-display text-2xl font-semibold tracking-tight hover:underline" style="color: var(--fp-ink)">{contact.email}</a>
+          <p class="mt-1 text-sm" style="color: var(--fp-muted)">{contact.address}</p>
+        </div>
+      </div>
+      <form class="mt-10 grid gap-3 text-left md:grid-cols-2" method="post" action="#">
+        <label class="flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
+          <span>Name</span>
+          <input name="name" required class="fp-input" autocomplete="name" />
+        </label>
+        <label class="flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
+          <span>Email</span>
+          <input type="email" name="email" required class="fp-input" autocomplete="email" />
+        </label>
+        <label class="md:col-span-2 flex flex-col gap-1.5 text-sm font-medium" style="color: var(--fp-ink)">
+          <span>How can we help?</span>
+          <textarea name="message" rows="4" required class="fp-input" style="resize: vertical;" />
+        </label>
+        <div class="md:col-span-2 mt-2 flex justify-center">
+          <button type="submit" class="fp-button">Send message <Icon name="arrow" size={16} class="ml-2" /></button>
+        </div>
+      </form>
+    </div>
+  )}
 </section>

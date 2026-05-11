@@ -49,7 +49,7 @@ const featured = tiers.find((t) => t.highlight) ?? tiers[1] ?? tiers[0];
   </div>
 
   {variant === 'stacked-cards' && (
-    <div class="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3 md:items-end md:gap-8">
+    <div class="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3 md:items-end md:gap-10 md:pb-6">
       {tiers.map((tier, idx) => {
         /*
          * 3-tier ledger - center card sits HIGHER (translateY -3vh) and

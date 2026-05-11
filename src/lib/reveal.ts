@@ -5,10 +5,9 @@
  *   The observer toggles `data-revealed="true"`; the actual transition is
  *   defined in src/styles/global.css and respects prefers-reduced-motion.
  *
- * - `[data-drift]` elements get a scroll-driven translateY so they move at
- *   slightly different speeds than the surrounding text. Two intensities:
- *     data-drift="slow"  -> 0.6x viewport speed (lazy weight)
- *     data-drift="fast"  -> 0.8x viewport speed (still lazy, just less so)
+ * - Only `[data-drift="slow"]` and `[data-drift="fast"]` are driven (decor
+ *   layers: figures, masked photos — never whole section wrappers). Values
+ *   are matched exactly so `data-drift="none"` never accidentally parallaxes.
  *   Reduced motion + small viewport (<=480px) collapse to no drift.
  *
  * Both drivers are idempotent: calling initReveal() twice is a no-op.
@@ -78,13 +77,15 @@ function initDriftDriver(): void {
   const tooNarrow = window.matchMedia('(max-width: 480px)').matches;
   if (reduceMotion || tooNarrow) return;
 
-  const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-drift]'));
+  const nodes = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-drift="slow"], [data-drift="fast"]'),
+  );
   if (nodes.length === 0) return;
 
   const entries: DriftEntry[] = nodes.map((el) => {
     const intensity = el.getAttribute('data-drift') ?? 'slow';
-    const factor =
-      intensity === 'fast' ? 0.2 : intensity === 'slow' ? 0.12 : 0.16; // negative = upward drift
+    /* Subtle factors: enough “weight” without fighting scroll or reading as bounce. */
+    const factor = intensity === 'fast' ? 0.10 : 0.06;
     return { el, factor, baseOffset: 0 };
   });
 

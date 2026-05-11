@@ -57,7 +57,7 @@ const variant = servicesVariantFor(meta.id);
   </div>
 
   {variant === 'peel-cards' && (
-    <div class="mt-16 grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-x-6 md:gap-y-10">
+    <div class="mt-16 grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-x-6 md:gap-y-12 md:pb-4">
       {services.slice(0, 6).map((service, idx) => {
         /*
          * Staggered 12-col grid - cards land on cols 1-4, 5-8, 9-12 but

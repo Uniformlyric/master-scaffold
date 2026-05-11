@@ -70,7 +70,7 @@ const driftAttr: string | undefined = meta.drift === 'none' ? undefined : meta.d
       </div>
     </div>
 
-    <div class="nm-cta__figure" data-drift={driftAttr ?? 'slow'}>
+    <div class="nm-cta__figure" data-drift={driftAttr}>
       <figure class="nm-cta__media nm-mask-blob-b">
         {peelMedia ? (
           <img
@@ -93,7 +93,7 @@ const driftAttr: string | undefined = meta.drift === 'none' ? undefined : meta.d
   .nm-cta {
     position: relative;
     overflow: hidden;
-    padding-block: clamp(6rem, 12vh, 10rem);
+    padding-block: clamp(7rem, 14vh, 11rem);
   }
 
   .nm-cta__grid {

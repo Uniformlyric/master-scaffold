@@ -11,7 +11,6 @@
     "astro": "astro",
     "typecheck": "astro check",
     "check:contrast": "node scripts/check-contrast.mjs",
-    "preview:matrix": "node scripts/snapshot-matrix.mjs",
     "lint": "echo \"(no lint configured for master-scaffold)\"",
     "clean": "rimraf dist .astro .turbo .previews"
   },
@@ -25,7 +24,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "playwright": "^1.59.1",
     "rimraf": "^6.0.1"
   }
 }

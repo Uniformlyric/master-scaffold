@@ -24,6 +24,14 @@
  * - .previews/index.html                  - contact-sheet style index
  * - .previews/manifest.json               - {shell, vibe, file, ms}[]
  *
+ * Local-only QA tool. Playwright is NOT pinned in master-scaffold/package.json
+ * (kept out so shipped client repos don't pull a 200 MB browser stack on
+ * `npm ci` in Cloudflare). To run the matrix locally, install Playwright
+ * temporarily into the workspace first:
+ *   pnpm add -D -w playwright
+ *   pnpm --filter master-scaffold exec playwright install chromium
+ * Then run the script as below. Remove the workspace dep afterwards.
+ *
  * Usage
  * ----------------------------------------------------------------
  *   pnpm --filter master-scaffold exec node scripts/snapshot-matrix.mjs

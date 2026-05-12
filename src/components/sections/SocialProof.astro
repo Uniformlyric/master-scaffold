@@ -8,25 +8,27 @@ const badges = defaultReviewBadges(siteDna.businessInfo);
 const meta = resolveShellMeta(siteDna);
 ---
 
-<section class="fp-section py-12 md:py-16" data-reveal>
-  {meta.exposedRules && <hr class="nm-rule nm-rule--ticked mb-8" />}
+<section class="fp-section" data-reveal>
+  <div class="mx-auto flex max-w-4xl flex-col gap-8">
+    {meta.exposedRules && <hr class="nm-rule nm-rule--ticked" />}
 
-  <div class="mx-auto mt-8 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4">
-    {badges.map((b) => (
-      <div
-        class="flex items-center justify-center gap-2 px-4 py-3"
-        style="border: var(--fp-border-width) solid var(--fp-border-color); border-radius: var(--nm-radius-sm, var(--fp-radius));"
-      >
-        <span class="flex" style="color: var(--nm-accent, var(--fp-accent))">
-          <Icon name="star" size={14} />
-        </span>
-        <div class="text-left leading-tight">
-          <p class="text-sm font-semibold" style="color: var(--fp-ink)">{b.score.toFixed(1)} {b.platform}</p>
-          <p class="font-mono text-[10px] uppercase tracking-wide" style="color: var(--fp-muted)">{b.count} reviews</p>
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {badges.map((b) => (
+        <div
+          class="flex items-center justify-center gap-2 px-4 py-3"
+          style="border: var(--fp-border-width) solid var(--fp-border-color); border-radius: var(--nm-radius-sm, var(--fp-radius));"
+        >
+          <span class="flex" style="color: var(--nm-accent, var(--fp-accent))">
+            <Icon name="star" size={14} />
+          </span>
+          <div class="text-left leading-tight">
+            <p class="text-sm font-semibold" style="color: var(--fp-ink)">{b.score.toFixed(1)} {b.platform}</p>
+            <p class="font-mono text-[10px] uppercase tracking-wide" style="color: var(--fp-muted)">{b.count} reviews</p>
+          </div>
         </div>
-      </div>
-    ))}
-  </div>
+      ))}
+    </div>
 
-  {meta.exposedRules && <hr class="nm-rule nm-rule--ticked mt-8" />}
+    {meta.exposedRules && <hr class="nm-rule nm-rule--ticked" />}
+  </div>
 </section>

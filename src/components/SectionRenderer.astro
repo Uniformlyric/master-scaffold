@@ -100,14 +100,14 @@ const labelText = meta ? labelTextFor(meta, SECTION_LABEL_NAME[section] ?? secti
  */
 const scraps = isNuzum ? scrapsFor(siteDna, section).filter((s) => s.corner !== labelCorner) : [];
 /*
- * Tone-pair attrs feed Phase H's peel rules. SVG section dividers are
- * intentionally not rendered - tone changes read as clean horizontal
- * seams across every vibe.
+ * Tone-pair attrs are kept for tooling but section peel is disabled: every
+ * section renders as a clean horizontal band. SVG dividers + peel were
+ * deliberately removed to stop content overlap/clipping across vibes
+ * (Modern/drift, Workshop, Vitrine, Cascade had aggressive peel).
  */
 const tonePrev = prevTone?.replace('nm-tone-', '').replace('fp-tone-', '') ?? null;
 const toneCur = nmTone ?? (fpTone ? fpTone.replace('fp-tone-', '') : null);
-const peelStrength = meta?.peelStrength ?? 0;
-const peelIn = isNuzum && peelStrength >= 1 && tonePrev && toneCur && tonePrev !== toneCur ? '' : undefined;
+const peelIn = undefined;
 ---
 
 <div

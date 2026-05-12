@@ -11,7 +11,6 @@ import Gallery from './sections/Gallery.astro';
 import BeforeAfter from './sections/BeforeAfter.astro';
 import ValueProps from './sections/ValueProps.astro';
 import FAQ from './sections/FAQ.astro';
-import SectionDivider from './SectionDivider.astro';
 import { shouldUseGradient, toneClassForIndex } from '../lib/multiTone';
 import { siteDna } from '../lib/siteDna';
 import { meshGradientFor } from '../lib/meshGradient';
@@ -101,16 +100,14 @@ const labelText = meta ? labelTextFor(meta, SECTION_LABEL_NAME[section] ?? secti
  */
 const scraps = isNuzum ? scrapsFor(siteDna, section).filter((s) => s.corner !== labelCorner) : [];
 /*
- * Tone-pair attrs feed Phase H's peel/divider rules and the new SectionDivider
- * SVG variants. We attach prev + cur tone (paper|moss|obsidian|leak) so CSS
- * and the divider component can choose slope/curve/torn-paper/hairline.
+ * Tone-pair attrs feed Phase H's peel rules. SVG section dividers are
+ * intentionally not rendered - tone changes read as clean horizontal
+ * seams across every vibe.
  */
 const tonePrev = prevTone?.replace('nm-tone-', '').replace('fp-tone-', '') ?? null;
 const toneCur = nmTone ?? (fpTone ? fpTone.replace('fp-tone-', '') : null);
 const peelStrength = meta?.peelStrength ?? 0;
 const peelIn = isNuzum && peelStrength >= 1 && tonePrev && toneCur && tonePrev !== toneCur ? '' : undefined;
-/* SVG divider on every tone change; peel-safe stacking in signature.css + SectionDivider. */
-const showDivider = Boolean(prevTone && prevTone !== tone);
 ---
 
 <div
@@ -133,7 +130,6 @@ const showDivider = Boolean(prevTone && prevTone !== tone);
     class:list={[tone, useGradient && !useMesh && 'fp-gradient', 'fp-section-surface']}
     style={meshStyle}
   >
-    {showDivider && <SectionDivider prevTone={prevTone} curTone={tone} vibe={vibe} />}
     {isNuzum && labelText && (
       <span class:list={['nm-label', cornerClass(labelCorner)]}>{labelText}</span>
     )}

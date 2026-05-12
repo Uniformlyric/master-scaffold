@@ -151,7 +151,8 @@ const finalKind =
     inset-inline: 0;
     top: 0;
     z-index: 5;
-    transform: translateY(-50%);
+    /* Full band above surface top so short sections (e.g. SocialProof) do not get a line through first-row UI */
+    transform: translateY(-100%);
   }
   .nm-divider > svg {
     height: clamp(56px, 7vh, 88px);

@@ -372,8 +372,16 @@
  * peel, sections meet at sharp horizontal edges; with peel, every other
  * tone change overlaps and the page reads as a continuous composition.
  */
-.fp-section-wrap[data-peel-in] > section,
-.fp-section-wrap[data-peel-in] > .nm-cta {
+:root[data-signature='nuzum-method'] .fp-section-wrap {
+  background: transparent;
+}
+
+.fp-section-surface {
+  position: relative;
+}
+
+.fp-section-wrap[data-peel-in] > .fp-section-surface > section,
+.fp-section-wrap[data-peel-in] > .fp-section-surface > .nm-cta {
   margin-top: var(--nm-peel-strong);
   position: relative;
   z-index: 2;
@@ -383,8 +391,8 @@
  * Smaller peel for wrappers in `quiet` density shells that don't want
  * dramatic overlap but still want the corner-clip "tucked" feel.
  */
-.fp-section-wrap[data-peel-in][data-density='quiet'] > section,
-.fp-section-wrap[data-peel-in][data-density='quiet'] > .nm-cta {
+.fp-section-wrap[data-peel-in][data-density='quiet'] > .fp-section-surface > section,
+.fp-section-wrap[data-peel-in][data-density='quiet'] > .fp-section-surface > .nm-cta {
   margin-top: var(--nm-peel-soft);
 }
 
@@ -393,7 +401,7 @@
  * header. SectionRenderer only marks data-peel-in when tone changes
  * AND index > 0, so this is defensive.
  */
-.fp-section-wrap[data-section-index='0'] > section {
+.fp-section-wrap[data-section-index='0'] > .fp-section-surface > section {
   margin-top: 0;
 }
 
@@ -404,12 +412,22 @@
  */
 :root[data-signature='nuzum-method']
   .fp-section-wrap:has(+ .fp-section-wrap[data-peel-in])
+  > .fp-section-surface
   > section.fp-section {
   padding-block-end: clamp(2.5rem, 6vh, 5rem);
 }
 
-:root[data-signature='nuzum-method'] .fp-section-wrap[data-peel-in] > section.fp-section {
+:root[data-signature='nuzum-method']
+  .fp-section-wrap[data-peel-in]
+  > .fp-section-surface
+  > section.fp-section {
   padding-block-start: clamp(1rem, 2.5vh, 2rem);
+}
+
+/* Corner stamps sit above peel-stacked SVG divider (z-index 5 in SectionDivider). */
+.fp-section-wrap[data-peel-in] > .fp-section-surface > .nm-label,
+.fp-section-wrap[data-peel-in] > .fp-section-surface > .nm-scrap {
+  z-index: 6;
 }
 
 /*

@@ -109,13 +109,12 @@ const tonePrev = prevTone?.replace('nm-tone-', '').replace('fp-tone-', '') ?? nu
 const toneCur = nmTone ?? (fpTone ? fpTone.replace('fp-tone-', '') : null);
 const peelStrength = meta?.peelStrength ?? 0;
 const peelIn = isNuzum && peelStrength >= 1 && tonePrev && toneCur && tonePrev !== toneCur ? '' : undefined;
-/* Peel is the seam transition; skip divider so SVG band is not clipped under peeled section. */
-const showDivider = Boolean(prevTone && prevTone !== tone) && peelIn === undefined;
+/* SVG divider on every tone change; peel-safe stacking in signature.css + SectionDivider. */
+const showDivider = Boolean(prevTone && prevTone !== tone);
 ---
 
 <div
-  class:list={[tone, useGradient && !useMesh && 'fp-gradient', 'fp-section-wrap']}
-  style={meshStyle}
+  class:list={['fp-section-wrap']}
   data-section={section}
   data-section-index={index}
   data-shell={shellAttrs?.['data-shell']}
@@ -130,31 +129,36 @@ const showDivider = Boolean(prevTone && prevTone !== tone) && peelIn === undefin
   data-tone-cur={toneCur}
   data-peel-in={peelIn}
 >
-  {showDivider && <SectionDivider prevTone={prevTone} curTone={tone} vibe={vibe} />}
-  {isNuzum && labelText && (
-    <span class:list={['nm-label', cornerClass(labelCorner)]}>{labelText}</span>
-  )}
-  {scraps.map((scrap) => (
-    <span class:list={['nm-scrap', scrapCornerClass(scrap.corner)]}>{scrap.text}</span>
-  ))}
-  {section === 'Hero' && <Hero />}
-  {section === 'Services' && <Services />}
-  {section === 'Testimonials' && <Testimonials />}
-  {section === 'Pricing' && <Pricing />}
-  {section === 'Contact' && <Contact />}
-  {section === 'SocialProof' && <SocialProof />}
-  {section === 'Logo' && <Logo />}
-  {section === 'Gallery' && <Gallery />}
-  {section === 'BeforeAfter' && <BeforeAfter />}
-  {section === 'ValueProps' && <ValueProps />}
-  {section === 'FAQ' && <FAQ />}
+  <div
+    class:list={[tone, useGradient && !useMesh && 'fp-gradient', 'fp-section-surface']}
+    style={meshStyle}
+  >
+    {showDivider && <SectionDivider prevTone={prevTone} curTone={tone} vibe={vibe} />}
+    {isNuzum && labelText && (
+      <span class:list={['nm-label', cornerClass(labelCorner)]}>{labelText}</span>
+    )}
+    {scraps.map((scrap) => (
+      <span class:list={['nm-scrap', scrapCornerClass(scrap.corner)]}>{scrap.text}</span>
+    ))}
+    {section === 'Hero' && <Hero />}
+    {section === 'Services' && <Services />}
+    {section === 'Testimonials' && <Testimonials />}
+    {section === 'Pricing' && <Pricing />}
+    {section === 'Contact' && <Contact />}
+    {section === 'SocialProof' && <SocialProof />}
+    {section === 'Logo' && <Logo />}
+    {section === 'Gallery' && <Gallery />}
+    {section === 'BeforeAfter' && <BeforeAfter />}
+    {section === 'ValueProps' && <ValueProps />}
+    {section === 'FAQ' && <FAQ />}
+  </div>
 </div>
 
 <style is:inline>
   /*
-   * The wrapper is the relative parent for the corner label, peel anchor,
-   * and any leak descendants. Sections inside drop their own relative
-   * containment to inherit this one.
+   * Outer wrap: data attrs + isolation only (no tone background — that
+   * lives on .fp-section-surface so peel seams do not flash wrapper paint).
+   * Surface is the relative parent for labels, divider, and peel margin.
    */
   .fp-section-wrap {
     position: relative;

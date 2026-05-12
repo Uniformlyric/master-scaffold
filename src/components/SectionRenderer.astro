@@ -76,7 +76,7 @@ const useGradient = !isNuzum
 const useMesh = useGradient && vibe === 'The Modern';
 const meshStyle = useMesh ? `background: ${meshGradientFor(siteDna.designTokens.multiTonePalette)};` : '';
 
-const showDivider = (prevTone && prevTone !== tone) || (meta?.forceDividers && index > 0);
+const showDivider = Boolean(prevTone && prevTone !== tone);
 
 const shellAttrs = meta ? shellAttrsFor(meta) : null;
 

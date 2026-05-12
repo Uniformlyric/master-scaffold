@@ -13,7 +13,7 @@
  *   paper -> obsidian           : slope-down (obsidian fill rises into paper)
  *   paper -> moss / moss -> paper : torn-paper edge
  *   leak -> *                   : long curve
- *   same-tone consecutive       : ticked hairline only
+ *   same-tone consecutive       : none (no spurious full-width hairline)
  *
  * The fill color matches the PREVIOUS section's background so the shape
  * looks like the previous tone is flowing into the current.
@@ -64,7 +64,7 @@ const previousFill = prev ? TONE_FILL[prev] ?? 'var(--fp-bg)' : 'var(--fp-bg)';
  *  'none'       - nothing rendered
  */
 function dividerKind(p: string | undefined, c: string | undefined): 'slope-up' | 'slope-down' | 'curve' | 'torn' | 'hairline' | 'none' {
-  if (!p || !c || p === c) return 'hairline';
+  if (!p || !c || p === c) return 'none';
   /* High-luminance contrast = editorial torn. */
   if ((p === 'paper' && c === 'obsidian') || (p === 'obsidian' && c === 'paper')) return 'torn';
   if (p === 'paper' && c === 'moss') return 'slope-down';
@@ -76,9 +76,10 @@ function dividerKind(p: string | undefined, c: string | undefined): 'slope-up' |
 
 const kind = dividerKind(prev, cur);
 
-/* Editorial / Heritage vibes prefer hard edges; downgrade to hairline. */
+/* Editorial / Heritage vibes prefer hard edges; downgrade curves to hairline. */
 const sharpEdges = vibe === 'The Editorial' || vibe === 'The Heritage';
-const finalKind = sharpEdges && kind !== 'hairline' ? 'hairline' : kind;
+const finalKind =
+  kind === 'none' ? 'none' : sharpEdges && kind !== 'hairline' ? 'hairline' : kind;
 ---
 
 {finalKind === 'hairline' && prevTone && (

@@ -583,47 +583,27 @@
 }
 
 /*
- * Native clip-path masks. The old SVG-data-URL mask-image approach was
- * unreliable in Chromium when the figure had aspect-ratio + object-cover
- * descendants - the mask wouldn't actually clip the rendered photo, so
- * users saw raw rectangles. clip-path is browser-native and clips at the
- * paint layer regardless of inner layout.
- *
- * Paths are normalized to a 200x200 viewBox via the implicit clip-path
- * coordinate space; with `clip-path: path()` the path is interpreted in
- * the element's local CSS pixel space, so we anchor on the 200x200 design
- * canvas and let the parent figure scale via aspect-ratio.
+ * Blob masks use inline SVG <clipPath clipPathUnits="objectBoundingBox"> in
+ * Layout.astro so clipping scales with the figure. Plain `clip-path: path()`
+ * used absolute pixel coords (~200px) and clipped hero photos to tiny slivers.
  */
 .nm-mask-blob,
 .nm-mask-blob-b,
 .nm-mask-blob-c {
-  /*
-   * Force the figure to a known coordinate space so the path lands.
-   * Apply the path's 200x200 viewBox at full element size via
-   * `clip-path` with percentage-based commands.
-   */
   overflow: hidden;
+  border-radius: clamp(28px, 4vw, 56px);
 }
 
 .nm-mask-blob {
-  clip-path: path('M155.4 49.6c14.4 18.4 19 47.5 8.7 67.7-10.4 20.2-35.6 31.5-60 32.9-24.4 1.4-48-7.1-63.8-23.7-15.7-16.6-23.6-41.3-15.5-60.7C32.9 46.4 56.9 32.5 80.2 27c23.3-5.5 45.9-2.5 60.6 6.4 14.7 9 21.5 23.5 14.6 16.2z');
+  clip-path: url(#nm-mask-blob);
 }
 
-/*
- * Variant blob B - more oval, weighted top-left. Used to rotate masks
- * across multi-photo sections (Gallery, Vitrine hero) so each photo
- * has its own shape silhouette.
- */
 .nm-mask-blob-b {
-  clip-path: path('M168 70c12 22 8 56-12 76-20 20-50 24-72 16-22-8-38-26-44-50-6-24 0-52 18-70 18-18 46-26 70-18 24 8 28 24 40 46z');
+  clip-path: url(#nm-mask-blob-b);
 }
 
-/*
- * Variant blob C - rounder, weighted bottom-right. Pairs visually with
- * variants A and B for editorial-spread compositions.
- */
 .nm-mask-blob-c {
-  clip-path: path('M150 30c30 18 40 56 32 84-8 28-34 50-62 56-28 6-58-4-72-26-14-22-12-54 4-78 16-24 44-44 70-44 18 0 22 4 28 8z');
+  clip-path: url(#nm-mask-blob-c);
 }
 
 .nm-mask-pill {
@@ -642,14 +622,13 @@
 }
 
 /*
- * Inherit clip-path on direct children. Lets a parent figure carry the
- * blob mask while a nested MonogramFigure or <img> picks it up
- * automatically without needing the class itself.
+ * Parent figure applies SVG clip-path; children must not inherit a second
+ * clip or nested transforms can double-clip.
  */
 .nm-mask-blob > *,
 .nm-mask-blob-b > *,
 .nm-mask-blob-c > * {
-  clip-path: inherit;
+  clip-path: none;
 }
 
 /* ============================================================

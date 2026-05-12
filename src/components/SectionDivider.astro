@@ -44,11 +44,12 @@ function normalizeTone(t: string | undefined): string | undefined {
 const prev = normalizeTone(prevTone);
 const cur = normalizeTone(curTone);
 
+/* Match actual section paints (signature.css nm-tone-*), not hardcoded globals. */
 const TONE_FILL: Record<string, string> = {
   paper: 'var(--fp-bg)',
-  obsidian: 'var(--nm-obsidian, var(--fp-ink))',
-  moss: 'var(--nm-moss, var(--fp-surface))',
-  leak: 'color-mix(in oklab, var(--nm-leak-1, var(--fp-accent)) 22%, var(--fp-bg))',
+  obsidian: 'var(--fp-cool-1, var(--fp-surface, var(--fp-ink)))',
+  moss: 'var(--fp-surface, var(--fp-bg))',
+  leak: 'color-mix(in oklab, var(--nm-leak-1, var(--fp-accent)) 22%, var(--fp-cool-1, var(--fp-surface)))',
 };
 
 const previousFill = prev ? TONE_FILL[prev] ?? 'var(--fp-bg)' : 'var(--fp-bg)';
@@ -133,6 +134,9 @@ const finalKind =
 <style is:inline>
   .nm-divider {
     display: block;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
     width: 100%;
     line-height: 0;
     pointer-events: none;

@@ -76,8 +76,6 @@ const useGradient = !isNuzum
 const useMesh = useGradient && vibe === 'The Modern';
 const meshStyle = useMesh ? `background: ${meshGradientFor(siteDna.designTokens.multiTonePalette)};` : '';
 
-const showDivider = Boolean(prevTone && prevTone !== tone);
-
 const shellAttrs = meta ? shellAttrsFor(meta) : null;
 
 /*
@@ -111,6 +109,8 @@ const tonePrev = prevTone?.replace('nm-tone-', '').replace('fp-tone-', '') ?? nu
 const toneCur = nmTone ?? (fpTone ? fpTone.replace('fp-tone-', '') : null);
 const peelStrength = meta?.peelStrength ?? 0;
 const peelIn = isNuzum && peelStrength >= 1 && tonePrev && toneCur && tonePrev !== toneCur ? '' : undefined;
+/* Peel is the seam transition; skip divider so SVG band is not clipped under peeled section. */
+const showDivider = Boolean(prevTone && prevTone !== tone) && peelIn === undefined;
 ---
 
 <div
